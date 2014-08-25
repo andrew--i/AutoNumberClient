@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,11 +16,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.Random;
 
+import ai.autonumber.adapter.ChatItemsArrayAdapter;
+import ai.autonumber.message.ChatMessage;
 import ai.autonumber.state.ActivitiState;
 
 
@@ -35,6 +39,8 @@ public class CameraTestActivity extends Activity {
         setContentView(R.layout.activity_camera_test);
         updateAppearance(ActivitiState.MAIN_STATE);
         context = this;
+
+        initChatView();
         Button camButton = (Button) findViewById(R.id.camButton);
         camButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,8 +68,37 @@ public class CameraTestActivity extends Activity {
             public void onClick(View view) {
                 if (currentActivitiState == ActivitiState.CAM_STATE)
                     updateAppearance(ActivitiState.MAIN_STATE);
+                else if (currentActivitiState == ActivitiState.MAIN_STATE) {
+                    addChatMessageFromInput();
+                }
             }
         });
+
+        chatButton.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    addChatMessageFromInput();
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    private void addChatMessageFromInput() {
+        ListView chatView = (ListView) findViewById(R.id.chatView);
+        final EditText chatInput = (EditText) findViewById(R.id.chatInput);
+        boolean left = new Random().nextBoolean();
+        ((ChatItemsArrayAdapter) chatView.getAdapter()).add(new ChatMessage(left, chatInput.getText().toString(), left ? "user1" : "user2"));
+        chatInput.setText("");
+    }
+
+    private void initChatView() {
+        ListView chatView = (ListView) findViewById(R.id.chatView);
+        ChatItemsArrayAdapter adapter = new ChatItemsArrayAdapter(getApplicationContext(), R.layout.chat_item);
+        chatView.setAdapter(adapter);
+
     }
 
     private void updateAppearance(ActivitiState state) {

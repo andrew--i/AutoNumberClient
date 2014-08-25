@@ -9,9 +9,9 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text='@string/mainContentText'/>
+        android:text='@string/mainContentText' />
 
-    <TextView
+    <ListView
         android:id="@+id/chatView"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
@@ -27,28 +27,28 @@
 
         <Button
             android:id="@+id/camButton"
+            style="@android:style/ButtonBar"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:text="@string/camButtonName"
-            style="@android:style/ButtonBar"/>
+            android:text="@string/camButtonName" />
 
         <EditText
+            android:id="@+id/chatInput"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/chatInput"
-            android:hint="@string/chatInputHint"
-            android:singleLine="true"
             android:layout_weight="0.5"
-            android:inputType="text" />
+            android:hint="@string/chatInputHint"
+            android:inputType="text"
+            android:singleLine="true" />
 
         <Button
             android:id="@+id/chatButton"
+            style="@android:style/ButtonBar"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:text="@string/chatButtonName"
-            style="@android:style/ButtonBar"/>
+            android:text="@string/chatButtonName" />
 
     </LinearLayout>
 </LinearLayout>
