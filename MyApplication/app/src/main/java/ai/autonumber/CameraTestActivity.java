@@ -17,11 +17,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.util.Random;
 
 import ai.autonumber.adapter.ChatItemsArrayAdapter;
 import ai.autonumber.gcm.GoogleCloudMessageActiviti;
-import ai.autonumber.message.ChatMessage;
+import ai.autonumber.model.ChatMessage;
 import ai.autonumber.state.ActivitiState;
 
 
@@ -30,8 +29,9 @@ public class CameraTestActivity extends GoogleCloudMessageActiviti {
     private Uri mUri;
     private ActivitiState currentActivitiState;
 
+
     @Override
-    public   void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera_test);
         updateAppearance(ActivitiState.MAIN_STATE);
@@ -89,11 +89,19 @@ public class CameraTestActivity extends GoogleCloudMessageActiviti {
     }
 
     private void addChatMessageFromInput() {
-        ListView chatView = (ListView) findViewById(R.id.chatView);
         final EditText chatInput = (EditText) findViewById(R.id.chatInput);
-        boolean left = new Random().nextBoolean();
-        ((ChatItemsArrayAdapter) chatView.getAdapter()).add(new ChatMessage(left, chatInput.getText().toString(), left ? "user1" : "user2"));
+        String comment = chatInput.getText().toString();
         chatInput.setText("");
+        sendMessage(comment);
+    }
+
+    @Override
+    protected void handleChatMessage(String message) {
+        ChatMessage chatMessage = ChatMessage.fromJson(message);
+        if (chatMessage != null) {
+            ListView chatView = (ListView) findViewById(R.id.chatView);
+            ((ChatItemsArrayAdapter) chatView.getAdapter()).add(chatMessage);
+        }
     }
 
     private void initChatView() {
@@ -141,6 +149,7 @@ public class CameraTestActivity extends GoogleCloudMessageActiviti {
         }
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -181,4 +190,15 @@ public class CameraTestActivity extends GoogleCloudMessageActiviti {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        restoreChatMessages();
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
 }

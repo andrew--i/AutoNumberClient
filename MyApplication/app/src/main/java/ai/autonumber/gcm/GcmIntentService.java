@@ -6,8 +6,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
+import android.util.Base64;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -26,13 +26,15 @@ public class GcmIntentService extends IntentService {
         super("GcmIntentService");
     }
 
+
     @Override
-    protected void onHandleIntent(Intent intent) {
-        Bundle extras = intent.getExtras();
+    protected void onHandleIntent(final Intent intent) {
+        final Bundle extras = intent.getExtras();
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
         // The getMessageType() intent parameter must be the intent you received
         // in your BroadcastReceiver.
         String messageType = gcm.getMessageType(intent);
+
 
         if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
             /*
@@ -51,10 +53,19 @@ public class GcmIntentService extends IntentService {
                 // If it's a regular GCM message, do some work.
             } else if (GoogleCloudMessaging.
                     MESSAGE_TYPE_MESSAGE.equals(messageType)) {
+                Intent activitiIntent = new Intent(GoogleCloudMessageActiviti.INTENT_ACTION);
+                //put whatever data you want to send, if any
+                String chatMessageKey = "chat-message";
+                Object o = extras.get(chatMessageKey);
+
+                activitiIntent.putExtra("message", o == null ? "<no message>" : new String(Base64.decode(o.toString(), Base64.DEFAULT)));
+                //send broadcast
+                getApplicationContext().sendBroadcast(activitiIntent);
+
                 // This loop represents the service doing some work.
-                Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
                 // Post notification of received message.
-                sendNotification("Received: " + extras.toString());
+                if (extras.containsKey(chatMessageKey))
+                    sendNotification("Пришло сообщение");
                 Log.i(TAG, "Received: " + extras.toString());
             }
         }
@@ -75,7 +86,7 @@ public class GcmIntentService extends IntentService {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_stat_gcm)
-                        .setContentTitle("GCM Notification")
+                        .setContentTitle(getString(R.string.app_name))
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(msg))
                         .setContentText(msg);

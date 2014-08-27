@@ -1,8 +1,5 @@
 package ai.autonumber.adapter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,11 +10,17 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import ai.autonumber.R;
-import ai.autonumber.message.ChatMessage;
+import ai.autonumber.model.ChatMessage;
+
 
 public class ChatItemsArrayAdapter extends ArrayAdapter<ChatMessage> {
 
@@ -27,6 +30,14 @@ public class ChatItemsArrayAdapter extends ArrayAdapter<ChatMessage> {
     @Override
     public void add(ChatMessage object) {
         messages.add(object);
+        Collections.sort(messages, new Comparator<ChatMessage>() {
+            @Override
+            public int compare(ChatMessage m1, ChatMessage m2) {
+                BigInteger mi1 = m1.getMessageIdAsBitInt();
+                BigInteger mi2 = m2.getMessageIdAsBitInt();
+                return mi1.compareTo(mi2);
+            }
+        });
         super.add(object);
     }
 
@@ -53,7 +64,7 @@ public class ChatItemsArrayAdapter extends ArrayAdapter<ChatMessage> {
         ChatMessage message = getItem(position);
 
         TextView chatMessageView = (TextView) row.findViewById(R.id.chatMessage);
-        chatMessageView.setText(message.comment);
+        chatMessageView.setText(message.getText());
         chatMessageView.setBackgroundResource(message.left ? R.drawable.bubble_yellow : R.drawable.bubble_green);
         LinearLayout.LayoutParams chatMessageLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         chatMessageLayoutParams.gravity = (message.left ? Gravity.START : Gravity.END);
@@ -61,9 +72,14 @@ public class ChatItemsArrayAdapter extends ArrayAdapter<ChatMessage> {
 
         ImageView userImageView = (ImageView) row.findViewById(R.id.userImage);
         userImageView.setImageResource(message.left ? R.drawable.user1 : R.drawable.user2);
-        LinearLayout.LayoutParams userImageLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        userImageLayoutParams.gravity = (!message.left ? Gravity.START : Gravity.END);
-        userImageView.setLayoutParams(userImageLayoutParams);
+
+        TextView userMessage = (TextView) row.findViewById(R.id.userMessage);
+        userMessage.setText(message.getUserId());
+
+        LinearLayout chatItemTop = (LinearLayout) row.findViewById(R.id.chatItemTop);
+        chatItemTop.setGravity(!message.left ? Gravity.START : Gravity.END);
+
+
         return row;
     }
 

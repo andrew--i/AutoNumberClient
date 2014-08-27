@@ -15,6 +15,7 @@
  */
 package ai.autonumber.gcm;
 
+import android.util.Base64;
 import android.util.Log;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -36,18 +38,18 @@ public final class ServerUtilities {
     private static final int MAX_ATTEMPTS = 5;
     private static final int BACKOFF_MILLI_SECONDS = 2000;
     private static final Random random = new Random();
-    private static final String SERVER_URL = "http://autonumber-webferm.1gb.ru/";
+    public static final String SERVER_URL = "http://autonumber-webferm.1gb.ru";
     private static final String TAG = "ServerUtilities";
 
     /**
      * Register this account/device pair within the server.
-     *
      */
-    static void register(final String regId) {
+    public static void register(final String regId, String userName) {
         Log.i(TAG, "registering device (regId = " + regId + ")");
         String serverUrl = SERVER_URL + "/register";
         Map<String, String> params = new HashMap<String, String>();
         params.put("regId", regId);
+        params.put("user", userName);
         long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
         // Once GCM returns a registration id, we need to register it in the
         // demo server. As the server might be down, we will retry it a couple
@@ -83,7 +85,7 @@ public final class ServerUtilities {
     /**
      * Unregister this account/device pair within the server.
      */
-    static void unregister(final String regId) {
+    public static void unregister(final String regId) {
         Log.i(TAG, "unregistering device (regId = " + regId + ")");
         String serverUrl = SERVER_URL + "/unregister";
         Map<String, String> params = new HashMap<String, String>();
@@ -105,8 +107,7 @@ public final class ServerUtilities {
      * Issue a POST request to the server.
      *
      * @param endpoint POST address.
-     * @param params request parameters.
-     *
+     * @param params   request parameters.
      * @throws java.io.IOException propagated from POST.
      */
     private static void post(String endpoint, Map<String, String> params)
@@ -147,12 +148,27 @@ public final class ServerUtilities {
             // handle the response
             int status = conn.getResponseCode();
             if (status != 200) {
-              throw new IOException("Post failed with error code " + status);
+                throw new IOException("Post failed with error code " + status);
             }
         } finally {
             if (conn != null) {
                 conn.disconnect();
             }
         }
-      }
+    }
+
+    public static void chatMessage(String message, String regid) throws IOException {
+
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("msg", Base64.encodeToString(message.getBytes(Charset.forName("utf-8")), Base64.DEFAULT));
+        params.put("regId", regid);
+        post(SERVER_URL + "/chat", params);
+    }
+
+    public static void restoreChatMessages(String regid, int lastMessageId) throws IOException {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("lastMsgId", "" + lastMessageId);
+        params.put("regId", regid);
+        post(SERVER_URL + "/messages", params);
+    }
 }

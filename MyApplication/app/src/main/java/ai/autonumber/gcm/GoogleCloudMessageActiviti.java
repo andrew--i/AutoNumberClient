@@ -1,7 +1,12 @@
 package ai.autonumber.gcm;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -15,7 +20,6 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Andrew on 26.08.2014.
@@ -23,21 +27,26 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class GoogleCloudMessageActiviti extends Activity {
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-
     private static final String TAG = "GoogleCloudMessage";
     private GoogleCloudMessaging gcm;
     private String regid;
+    private String userName;
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
     protected Context context;
     private static final String SENDER_ID = "1015113832014";
-    private AtomicInteger msgId = new AtomicInteger();
+    public static final String INTENT_ACTION = TAG + SENDER_ID;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = this;
 
+        Account[] accounts = AccountManager.get(this).getAccountsByType("com.google");
+        if (accounts.length == 0) {
+            Toast.makeText(context, "Не удалось определить имя пользователя", Toast.LENGTH_SHORT).show();
+        }
+        userName = accounts[0].name;
         // Check device for Play Services APK.
         if (checkPlayServices()) {
             gcm = GoogleCloudMessaging.getInstance(this);
@@ -136,7 +145,7 @@ public abstract class GoogleCloudMessageActiviti extends Activity {
      * using the 'from' address in the message.
      */
     private void sendRegistrationIdToBackend() {
-        ServerUtilities.register(regid);
+        ServerUtilities.register(regid, userName);
     }
 
     /**
@@ -162,6 +171,13 @@ public abstract class GoogleCloudMessageActiviti extends Activity {
     protected void onResume() {
         super.onResume();
         checkPlayServices();
+        context.registerReceiver(mMessageReceiver, new IntentFilter(INTENT_ACTION));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        context.unregisterReceiver(mMessageReceiver);
     }
 
     /**
@@ -188,20 +204,36 @@ public abstract class GoogleCloudMessageActiviti extends Activity {
         new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] params) {
-                String msg;
+                String msg = message;
                 try {
-                    Bundle data = new Bundle();
-                    data.putString("my_message", message);
-                    data.putString("my_action",
-                            "com.google.android.gcm.demo.app.ECHO_NOW");
-                    String id = Integer.toString(msgId.incrementAndGet());
-                    gcm.send(SENDER_ID + "@gcm.googleapis.com", id, data);
-                    msg = "Sent message";
+                    ServerUtilities.chatMessage(message, regid);
                 } catch (IOException ex) {
                     msg = "Error :" + ex.getMessage();
                 }
                 return msg;
             }
         }.execute(null, null, null);
+    }
+
+
+    //This is the handler that will manager to process the broadcast intent
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            // Extract data included in the Intent
+            String message = intent.getStringExtra("message");
+            handleChatMessage(message);
+        }
+    };
+
+    protected abstract void handleChatMessage(String message);
+
+    protected void restoreChatMessages() {
+        try {
+            ServerUtilities.restoreChatMessages(regid, 0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
