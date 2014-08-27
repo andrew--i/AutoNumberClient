@@ -8,15 +8,13 @@
         android:id="@+id/camPreview"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text='@string/mainContentText' />
+        android:layout_weight="1" />
 
     <ListView
         android:id="@+id/chatView"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text='@string/mainContentText'
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <LinearLayout
