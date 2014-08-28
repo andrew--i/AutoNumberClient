@@ -193,7 +193,7 @@ public class CameraTestActivity extends GoogleCloudMessageActiviti {
     @Override
     protected void onResume() {
         super.onResume();
-//        restoreChatMessages();
+        restoreChatMessages();
     }
 
 

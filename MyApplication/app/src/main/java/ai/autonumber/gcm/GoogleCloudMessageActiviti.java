@@ -230,10 +230,19 @@ public abstract class GoogleCloudMessageActiviti extends Activity {
     protected abstract void handleChatMessage(String message);
 
     protected void restoreChatMessages() {
-        try {
-            ServerUtilities.restoreChatMessages(regid, 0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] params) {
+                try {
+                    ServerUtilities.restoreChatMessages(regid, 0);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        }.execute(null, null, null);
+
+
     }
 }

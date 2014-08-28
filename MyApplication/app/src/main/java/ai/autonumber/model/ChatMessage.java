@@ -19,6 +19,16 @@ public class ChatMessage implements Serializable {
     private String time;
     public boolean left = new Random().nextBoolean();
     private BigInteger messageIdAsBitInt;
+    private String userName;
+
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
     public String getUserId() {
         return userId;
@@ -58,8 +68,16 @@ public class ChatMessage implements Serializable {
             ChatMessage chatMessage = new ChatMessage();
             chatMessage.setMessageId(jsonObject.getString("messageId"));
             chatMessage.messageIdAsBitInt = new BigInteger(chatMessage.messageId);
-            byte[] decode = Base64.decode(jsonObject.getString("text").getBytes(), Base64.DEFAULT);
-            chatMessage.setText(new String(decode));
+            chatMessage.userName = jsonObject.getString("userName");
+
+            try {
+                byte[] decode = Base64.decode(jsonObject.getString("text").getBytes(), Base64.DEFAULT);
+                chatMessage.setText(new String(decode));
+            } catch (Exception e) {
+                chatMessage.setText(jsonObject.getString("text"));
+            }
+
+
             chatMessage.setUserId(jsonObject.getString("userId"));
             chatMessage.setTime(jsonObject.getString("time"));
             return chatMessage;
