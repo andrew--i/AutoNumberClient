@@ -38,7 +38,7 @@ public final class ServerUtilities {
     private static final int MAX_ATTEMPTS = 5;
     private static final int BACKOFF_MILLI_SECONDS = 2000;
     private static final Random random = new Random();
-    public static final String SERVER_URL = "http://autonumber-webferm.1gb.ru";
+    public static final String SERVER_URL = "http://autonumber.herokuapp.com";
     private static final String TAG = "ServerUtilities";
 
     /**
