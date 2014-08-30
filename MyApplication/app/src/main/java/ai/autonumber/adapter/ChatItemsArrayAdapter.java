@@ -28,8 +28,13 @@ public class ChatItemsArrayAdapter extends ArrayAdapter<ChatMessage> {
     private List<ChatMessage> messages = new ArrayList<ChatMessage>();
 
     @Override
-    public void add(ChatMessage object) {
-        messages.add(object);
+    public void add(ChatMessage message) {
+        for (ChatMessage chatMessage : messages) {
+            if(message.getMessageId().equalsIgnoreCase(chatMessage.getMessageId()))
+                return;
+        }
+
+        messages.add(message);
         Collections.sort(messages, new Comparator<ChatMessage>() {
             @Override
             public int compare(ChatMessage m1, ChatMessage m2) {
@@ -38,7 +43,7 @@ public class ChatItemsArrayAdapter extends ArrayAdapter<ChatMessage> {
                 return mi1.compareTo(mi2);
             }
         });
-        super.add(object);
+        super.add(message);
     }
 
     public ChatItemsArrayAdapter(Context context, int textViewResourceId) {
@@ -74,7 +79,7 @@ public class ChatItemsArrayAdapter extends ArrayAdapter<ChatMessage> {
         userImageView.setImageResource(message.left ? R.drawable.user1 : R.drawable.user2);
 
         TextView userMessage = (TextView) row.findViewById(R.id.userMessage);
-        userMessage.setText(message.getUserId());
+        userMessage.setText(message.getUserName());
 
         LinearLayout chatItemTop = (LinearLayout) row.findViewById(R.id.chatItemTop);
         chatItemTop.setGravity(!message.left ? Gravity.START : Gravity.END);

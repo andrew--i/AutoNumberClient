@@ -38,7 +38,8 @@
             android:layout_weight="0.5"
             android:hint="@string/chatInputHint"
             android:inputType="text"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:maxLength="250"/>
 
         <Button
             android:id="@+id/chatButton"

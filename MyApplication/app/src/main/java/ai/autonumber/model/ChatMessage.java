@@ -17,7 +17,7 @@ public class ChatMessage implements Serializable {
     private String text;
     private String messageId;
     private String time;
-    public boolean left = new Random().nextBoolean();
+    public boolean left;
     private BigInteger messageIdAsBitInt;
     private String userName;
 

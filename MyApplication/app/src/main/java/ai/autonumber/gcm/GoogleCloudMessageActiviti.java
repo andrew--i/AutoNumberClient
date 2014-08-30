@@ -30,7 +30,7 @@ public abstract class GoogleCloudMessageActiviti extends Activity {
     private static final String TAG = "GoogleCloudMessage";
     private GoogleCloudMessaging gcm;
     private String regid;
-    private String userName;
+    protected String userName;
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
     protected Context context;
@@ -220,7 +220,6 @@ public abstract class GoogleCloudMessageActiviti extends Activity {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
             // Extract data included in the Intent
             String message = intent.getStringExtra("message");
             handleChatMessage(message);

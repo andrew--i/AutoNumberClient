@@ -22,6 +22,7 @@ import ai.autonumber.adapter.ChatItemsArrayAdapter;
 import ai.autonumber.gcm.GoogleCloudMessageActiviti;
 import ai.autonumber.model.ChatMessage;
 import ai.autonumber.state.ActivitiState;
+import ai.autonumber.state.ActivitiStateHolder;
 
 
 public class CameraTestActivity extends GoogleCloudMessageActiviti {
@@ -98,6 +99,7 @@ public class CameraTestActivity extends GoogleCloudMessageActiviti {
     @Override
     protected void handleChatMessage(String message) {
         ChatMessage chatMessage = ChatMessage.fromJson(message);
+        chatMessage.left = userName.equalsIgnoreCase(chatMessage.getUserName());
         if (chatMessage != null) {
             ListView chatView = (ListView) findViewById(R.id.chatView);
             ((ChatItemsArrayAdapter) chatView.getAdapter()).add(chatMessage);
@@ -193,6 +195,7 @@ public class CameraTestActivity extends GoogleCloudMessageActiviti {
     @Override
     protected void onResume() {
         super.onResume();
+        ActivitiStateHolder.activityResumed();
         restoreChatMessages();
     }
 
@@ -200,5 +203,6 @@ public class CameraTestActivity extends GoogleCloudMessageActiviti {
     @Override
     protected void onPause() {
         super.onPause();
+        ActivitiStateHolder.activityPaused();
     }
 }

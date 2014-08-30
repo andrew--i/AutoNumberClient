@@ -14,6 +14,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import ai.autonumber.CameraTestActivity;
 import ai.autonumber.R;
+import ai.autonumber.state.ActivitiStateHolder;
 
 /**
  * Created by Andrew on 26.08.2014.
@@ -64,7 +65,7 @@ public class GcmIntentService extends IntentService {
 
                 // This loop represents the service doing some work.
                 // Post notification of received message.
-                if (extras.containsKey(chatMessageKey))
+                if (extras.containsKey(chatMessageKey) && !ActivitiStateHolder.isActivityVisible())
                     sendNotification("Пришло сообщение");
                 Log.i(TAG, "Received: " + extras.toString());
             }
