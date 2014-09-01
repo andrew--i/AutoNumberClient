@@ -1,6 +1,7 @@
 package ai.autonumber;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -14,12 +15,15 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import ai.autonumber.adapter.ChatItemsArrayAdapter;
 import ai.autonumber.gcm.GoogleCloudMessageActiviti;
+import ai.autonumber.gcm.ServerUtilities;
 import ai.autonumber.model.ChatMessage;
 import ai.autonumber.state.ActivitiState;
 import ai.autonumber.state.ActivitiStateHolder;
@@ -50,12 +54,18 @@ public class CameraTestActivity extends GoogleCloudMessageActiviti {
                         Toast.makeText(context, "SD card not available", Toast.LENGTH_LONG).show();
                         return;
                     }
-
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
                     startActivityForResult(intent, PHOTO_INTENT_REQUEST_CODE);
                 } else {
+                    ImageView imageView = (ImageView) findViewById(R.id.camPreview);
+                    imageView.setDrawingCacheEnabled(true);
+                    Bitmap bitmap = imageView.getDrawingCache();
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] byteArray = stream.toByteArray();
                     updateAppearance(ActivitiState.MAIN_STATE);
+                    sendImage(byteArray);
                 }
             }
         });
@@ -84,6 +94,7 @@ public class CameraTestActivity extends GoogleCloudMessageActiviti {
         });
     }
 
+
     @Override
     protected String getMainActivitiClassName() {
         return CameraTestActivity.class.getSimpleName();
@@ -99,11 +110,18 @@ public class CameraTestActivity extends GoogleCloudMessageActiviti {
     @Override
     protected void handleChatMessage(String message) {
         ChatMessage chatMessage = ChatMessage.fromJson(message);
-        chatMessage.left = userName.equalsIgnoreCase(chatMessage.getUserName());
         if (chatMessage != null) {
+            chatMessage.left = userName.equalsIgnoreCase(chatMessage.getUserName());
             ListView chatView = (ListView) findViewById(R.id.chatView);
             ((ChatItemsArrayAdapter) chatView.getAdapter()).add(chatMessage);
         }
+    }
+
+    @Override
+    protected void handleSearchCarNumber(String searchCarNumber) {
+        TextView textView = (TextView) findViewById(R.id.searchNumberTextField);
+        if (textView != null)
+            textView.setText(getString(R.string.searchCarNumberTemplate) + searchCarNumber);
     }
 
     private void initChatView() {
@@ -165,7 +183,7 @@ public class CameraTestActivity extends GoogleCloudMessageActiviti {
             return null;
 
         // Проверяем и создаем директорию
-        File path = new File(Environment.getExternalStorageDirectory(), "CameraTest");
+        File path = new File(Environment.getExternalStorageDirectory(), getString(R.string.app_name));
         if (!path.exists()) {
             if (!path.mkdirs()) {
                 return null;
@@ -197,6 +215,7 @@ public class CameraTestActivity extends GoogleCloudMessageActiviti {
         super.onResume();
         ActivitiStateHolder.activityResumed();
         restoreChatMessages();
+        restoreSearchCarNumber();
     }
 
 

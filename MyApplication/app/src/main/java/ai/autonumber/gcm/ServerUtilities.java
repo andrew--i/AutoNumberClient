@@ -172,4 +172,17 @@ public final class ServerUtilities {
         params.put("regId", regid);
         post(SERVER_URL + "/messages", params);
     }
+
+    public static void sendNewGameResultImage(String regid, byte[] byteArray) throws IOException {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("image", Base64.encodeToString(byteArray, Base64.DEFAULT));
+        params.put("regId", regid);
+        post(SERVER_URL + "/newimage", params);
+    }
+
+    public static void restoreSearchCarNumber(String regid) throws IOException {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("regId", regid);
+        post(SERVER_URL + "/searchNumber", params);
+    }
 }

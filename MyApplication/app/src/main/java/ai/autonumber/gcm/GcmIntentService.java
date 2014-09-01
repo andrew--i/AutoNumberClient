@@ -56,17 +56,21 @@ public class GcmIntentService extends IntentService {
                     MESSAGE_TYPE_MESSAGE.equals(messageType)) {
                 Intent activitiIntent = new Intent(GoogleCloudMessageActiviti.INTENT_ACTION);
                 //put whatever data you want to send, if any
-                String chatMessageKey = "chat-message";
-                Object o = extras.get(chatMessageKey);
-
-                activitiIntent.putExtra("message", o == null ? "<no message>" : new String(Base64.decode(o.toString(), Base64.DEFAULT)));
+                final String chatMessageKey = "chat-message";
+                final String seatchCarNumberKey = "search-car-number";
+                Object chatMessageObject = extras.get(chatMessageKey);
+                Object searchCarObject = extras.get(seatchCarNumberKey);
+                activitiIntent.putExtra("message", chatMessageObject == null ? "<no message>" : new String(Base64.decode(chatMessageObject.toString(), Base64.DEFAULT)));
+                if (searchCarObject != null)
+                    activitiIntent.putExtra("searchCar", searchCarObject.toString());
                 //send broadcast
                 getApplicationContext().sendBroadcast(activitiIntent);
 
                 // This loop represents the service doing some work.
                 // Post notification of received message.
-                if (extras.containsKey(chatMessageKey) && !ActivitiStateHolder.isActivityVisible())
-                    sendNotification("Пришло сообщение");
+                if (!ActivitiStateHolder.isActivityVisible())
+                    if (extras.containsKey(chatMessageKey) || extras.containsKey(seatchCarNumberKey))
+                        sendNotification("Пришло сообщение");
                 Log.i(TAG, "Received: " + extras.toString());
             }
         }

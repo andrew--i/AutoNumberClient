@@ -3,6 +3,14 @@
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
+    <TextView
+        android:id="@+id/searchNumberTextField"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:padding="10dp"
+        android:textSize="20sp"
+        android:text="@string/searchCarNumberTemplate" />
 
     <ImageView
         android:id="@+id/camPreview"
@@ -38,8 +46,8 @@
             android:layout_weight="0.5"
             android:hint="@string/chatInputHint"
             android:inputType="text"
-            android:singleLine="true"
-            android:maxLength="250"/>
+            android:maxLength="250"
+            android:singleLine="true" />
 
         <Button
             android:id="@+id/chatButton"

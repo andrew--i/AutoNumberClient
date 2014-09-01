@@ -9,5 +9,6 @@
     <string name="sendButtonName">Send</string>
     <string name="backButtonName">Back</string>
     <string name="chatInputHint">Say:</string>
+    <string name="searchCarNumberTemplate">Ищем номер машины: </string>
 
 </resources>

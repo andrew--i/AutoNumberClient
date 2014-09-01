@@ -102,40 +102,28 @@ public abstract class GoogleCloudMessageActiviti extends Activity {
      * shared preferences.
      */
     private void registerInBackground() {
-        new AsyncTask() {
+        runAsync(new Action() {
             @Override
-            protected Object doInBackground(Object[] objects) {
-                String msg = "";
-                try {
-                    if (gcm == null) {
-                        gcm = GoogleCloudMessaging.getInstance(context);
-                    }
-                    regid = gcm.register(SENDER_ID);
-                    msg = "Device registered, registration ID=" + regid;
-
-                    // You should send the registration ID to your server over HTTP,
-                    // so it can use GCM/HTTP or CCS to send messages to your app.
-                    // The request to your server should be authenticated if your app
-                    // is using accounts.
-                    sendRegistrationIdToBackend();
-
-                    // For this demo: we don't need to send it because the device
-                    // will send upstream messages to a server that echo back the
-                    // message using the 'from' address in the message.
-
-                    // Persist the regID - no need to register again.
-                    storeRegistrationId(context, regid);
-                } catch (IOException ex) {
-                    msg = "Error :" + ex.getMessage();
-                    // If there is an error, don't just keep trying to register.
-                    // Require the user to click a button again, or perform
-                    // exponential back-off.
+            public void doAction() throws IOException {
+                if (gcm == null) {
+                    gcm = GoogleCloudMessaging.getInstance(context);
                 }
-                return msg;
+                regid = gcm.register(SENDER_ID);
+
+                // You should send the registration ID to your server over HTTP,
+                // so it can use GCM/HTTP or CCS to send messages to your app.
+                // The request to your server should be authenticated if your app
+                // is using accounts.
+                sendRegistrationIdToBackend();
+
+                // For this demo: we don't need to send it because the device
+                // will send upstream messages to a server that echo back the
+                // message using the 'from' address in the message.
+
+                // Persist the regID - no need to register again.
+                storeRegistrationId(context, regid);
             }
-
-        }.execute(null, null, null);
-
+        });
     }
 
     /**
@@ -201,18 +189,12 @@ public abstract class GoogleCloudMessageActiviti extends Activity {
     }
 
     protected void sendMessage(final String message) {
-        new AsyncTask() {
+        runAsync(new Action() {
             @Override
-            protected Object doInBackground(Object[] params) {
-                String msg = message;
-                try {
-                    ServerUtilities.chatMessage(message, regid);
-                } catch (IOException ex) {
-                    msg = "Error :" + ex.getMessage();
-                }
-                return msg;
+            public void doAction() throws IOException {
+                ServerUtilities.chatMessage(message, regid);
             }
-        }.execute(null, null, null);
+        });
     }
 
 
@@ -223,25 +205,60 @@ public abstract class GoogleCloudMessageActiviti extends Activity {
             // Extract data included in the Intent
             String message = intent.getStringExtra("message");
             handleChatMessage(message);
+            String searchCarNumber = intent.getStringExtra("search-car-number");
+            if (searchCarNumber != null)
+                handleSearchCarNumber(searchCarNumber);
         }
     };
+
+    protected abstract void handleSearchCarNumber(String searchCarNumber);
 
     protected abstract void handleChatMessage(String message);
 
     protected void restoreChatMessages() {
 
+        runAsync(new Action() {
+            @Override
+            public void doAction() throws IOException {
+                ServerUtilities.restoreChatMessages(regid, 0);
+            }
+        });
+    }
+
+    protected void restoreSearchCarNumber() {
+        runAsync(new Action() {
+            @Override
+            public void doAction() throws IOException {
+                ServerUtilities.restoreSearchCarNumber(regid);
+            }
+        });
+    }
+
+
+    protected void sendImage(final byte[] byteArray) {
+        runAsync(new Action() {
+            @Override
+            public void doAction() throws IOException {
+                ServerUtilities.sendNewGameResultImage(regid, byteArray);
+            }
+        });
+    }
+
+    interface Action {
+        void doAction() throws IOException;
+    }
+
+    private void runAsync(final Action action) {
         new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] params) {
                 try {
-                    ServerUtilities.restoreChatMessages(regid, 0);
+                    action.doAction();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 return null;
             }
         }.execute(null, null, null);
-
-
     }
 }
