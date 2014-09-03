@@ -9,20 +9,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import ai.autonumber.AutoNumberChatActivity;
 import ai.autonumber.R;
+import ai.autonumber.gcm.ServerUtilities;
+import ai.autonumber.model.CarMessage;
 
 public class MainController extends Controller {
 
     public static final int PHOTO_INTENT_REQUEST_CODE = 123;
     private Uri mUri;
+    private CarMessage lastCarMessage;
 
     public MainController(final AutoNumberChatActivity activity, final ControllerManager controllerManager) {
         super(activity, controllerManager);
@@ -81,6 +86,7 @@ public class MainController extends Controller {
             }
         });
 
+        updateCarPreview();
     }
 
     @Override
@@ -90,5 +96,33 @@ public class MainController extends Controller {
 
     public Uri getImageFile() {
         return mUri;
+    }
+
+    public void handleCarMessage(CarMessage carMessage) {
+        lastCarMessage = carMessage;
+        if (controllerManager.isActiveController(thisController()))
+            updateCarPreview();
+    }
+
+    private void updateCarPreview() {
+        ImageView imageView = (ImageView) activity.findViewById(R.id.imagePreview);
+        if (lastCarMessage == null)
+            imageView.setImageBitmap(null);
+        else
+            imageView.setImageBitmap(lastCarMessage.getBitmap());
+    }
+
+    @Override
+    public void resumeController() {
+        restoreLastCarMessage();
+    }
+
+    private void restoreLastCarMessage() {
+        runAsync(new Action() {
+            @Override
+            public void doAction() throws IOException {
+                ServerUtilities.restoreLastCarResult(activity.regid);
+            }
+        });
     }
 }

@@ -8,6 +8,7 @@ import android.widget.Toast;
 import ai.autonumber.controller.ControllerManager;
 import ai.autonumber.controller.MainController;
 import ai.autonumber.gcm.GoogleCloudMessageActivity;
+import ai.autonumber.model.CarMessage;
 import ai.autonumber.model.ChatMessage;
 import ai.autonumber.state.ActivitiStateHolder;
 
@@ -31,15 +32,18 @@ public class AutoNumberChatActivity extends GoogleCloudMessageActivity {
 
 
     @Override
-    protected void handleChatMessage(String message) {
-        ChatMessage chatMessage = ChatMessage.fromJson(message);
-        if (chatMessage != null)
-            controllerManager.handleChatMessage(chatMessage, userName.equalsIgnoreCase(chatMessage.getUserName()));
+    protected void handleChatMessage(ChatMessage message) {
+        controllerManager.handleChatMessage(message, userName.equalsIgnoreCase(message.getUserName()));
     }
 
     @Override
-    protected void handleSearchCarNumber(String searchCarNumber) {
+    protected void handleNewCarMessage(CarMessage carMessage) {
+        controllerManager.handleNewCarMessage(carMessage);
+    }
 
+    @Override
+    protected void handleLastCarMessage(CarMessage carMessage) {
+        controllerManager.handleLastCarMessage(carMessage);
     }
 
     @Override

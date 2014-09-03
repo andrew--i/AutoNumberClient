@@ -8,6 +8,7 @@ import java.util.List;
 
 import ai.autonumber.AutoNumberChatActivity;
 import ai.autonumber.R;
+import ai.autonumber.model.CarMessage;
 import ai.autonumber.model.ChatMessage;
 
 
@@ -92,5 +93,13 @@ public class ControllerManager {
 
     public void setActiveMainController() {
         setActiveController(mainController);
+    }
+
+    public void handleNewCarMessage(CarMessage carMessage) {
+        mainController.handleCarMessage(carMessage);
+    }
+
+    public void handleLastCarMessage(CarMessage carMessage) {
+        mainController.handleCarMessage(carMessage);
     }
 }

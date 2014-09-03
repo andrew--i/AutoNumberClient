@@ -93,9 +93,4 @@ public class ChatItemsArrayAdapter extends ArrayAdapter<ChatMessage> {
 
         return row;
     }
-
-    public Bitmap decodeToBitmap(byte[] decodedByte) {
-        return BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
-    }
-
 }

@@ -21,6 +21,9 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;
 
+import ai.autonumber.model.CarMessage;
+import ai.autonumber.model.ChatMessage;
+
 
 public abstract class GoogleCloudMessageActivity extends Activity {
 
@@ -198,17 +201,34 @@ public abstract class GoogleCloudMessageActivity extends Activity {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // Extract data included in the Intent
+
+
             String message = intent.getStringExtra(GcmIntentService.CHAT_MESSAGE_TOKEN);
-            handleChatMessage(message);
-            String searchCarNumber = intent.getStringExtra("search-car-number");
-            if (searchCarNumber != null)
-                handleSearchCarNumber(searchCarNumber);
+            if (message != null) {
+                ChatMessage chatMessage = ChatMessage.fromJson(message);
+                handleChatMessage(chatMessage);
+            }
+
+            String newCarMessage = intent.getStringExtra(GcmIntentService.NEW_CAR_MESSAGE_TOKEN);
+            if (newCarMessage != null) {
+                CarMessage carMessage = CarMessage.fromJson(newCarMessage);
+                if (carMessage != null)
+                    handleNewCarMessage(carMessage);
+            }
+            newCarMessage = intent.getStringExtra(GcmIntentService.LAST_CAR_MESSAGE_TOKEN);
+            if (newCarMessage != null) {
+                CarMessage carMessage = CarMessage.fromJson(newCarMessage);
+                if (carMessage != null)
+                    handleLastCarMessage(carMessage);
+            }
+
         }
     };
 
-    protected abstract void handleSearchCarNumber(String searchCarNumber);
+    protected abstract void handleLastCarMessage(CarMessage carMessage);
 
-    protected abstract void handleChatMessage(String message);
+    protected abstract void handleNewCarMessage(CarMessage carMessage);
+
+    protected abstract void handleChatMessage(ChatMessage chatMessage);
 
 }

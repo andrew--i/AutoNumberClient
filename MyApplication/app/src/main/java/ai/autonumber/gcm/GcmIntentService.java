@@ -41,42 +41,46 @@ public class GcmIntentService extends IntentService {
         String messageType = gcm.getMessageType(intent);
 
 
-        if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
-            /*
-             * Filter messages based on message type. Since it is likely that GCM
-             * will be extended in the future with new message types, just ignore
-             * any message types you're not interested in, or that you don't
-             * recognize.
-             */
-            if (GoogleCloudMessaging.
-                    MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
-                sendNotification("Send error: " + extras.toString());
-            } else if (GoogleCloudMessaging.
-                    MESSAGE_TYPE_DELETED.equals(messageType)) {
-                sendNotification("Deleted messages on server: " +
-                        extras.toString());
-                // If it's a regular GCM message, do some work.
-            } else if (GoogleCloudMessaging.
-                    MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                Intent activitiIntent = new Intent(GoogleCloudMessageActivity.INTENT_ACTION);
-                //put whatever data you want to send, if any
+        // has effect of unparcelling Bundle
+/*
+ * Filter messages based on message type. Since it is likely that GCM
+ * will be extended in the future with new message types, just ignore
+ * any message types you're not interested in, or that you don't
+ * recognize.
+ */
+        if (!extras.isEmpty()) if (GoogleCloudMessaging.
+                MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
+            sendNotification("Send error: " + extras.toString());
+        } else if (GoogleCloudMessaging.
+                MESSAGE_TYPE_DELETED.equals(messageType)) {
+            sendNotification("Deleted messages on server: " +
+                    extras.toString());
+            // If it's a regular GCM message, do some work.
+        } else if (GoogleCloudMessaging.
+                MESSAGE_TYPE_MESSAGE.equals(messageType)) {
+            Intent activitiIntent = new Intent(GoogleCloudMessageActivity.INTENT_ACTION);
+            //put whatever data you want to send, if any
 
 
-                Object chatMessageObject = extras.get(CHAT_MESSAGE_TOKEN);
-                Object searchCarObject = extras.get(CHAT_MESSAGE_TOKEN);
-                activitiIntent.putExtra(CHAT_MESSAGE_TOKEN, chatMessageObject == null ? "<no message>" : new String(Base64.decode(chatMessageObject.toString(), Base64.DEFAULT)));
-                if (searchCarObject != null)
-                    activitiIntent.putExtra("searchCar", searchCarObject.toString());
-                //send broadcast
-                getApplicationContext().sendBroadcast(activitiIntent);
+            Object chatMessageObject = extras.get(CHAT_MESSAGE_TOKEN);
 
-                // This loop represents the service doing some work.
-                // Post notification of received message.
-                if (!ActivitiStateHolder.isActivityVisible())
-                    if (extras.containsKey(CHAT_MESSAGE_TOKEN) || extras.containsKey(NEW_CAR_MESSAGE_TOKEN))
-                        sendNotification("Пришло сообщение");
-                Log.i(TAG, "Received: " + extras.toString());
-            }
+            if (chatMessageObject != null)
+                activitiIntent.putExtra(CHAT_MESSAGE_TOKEN, new String(Base64.decode(chatMessageObject.toString(), Base64.DEFAULT)));
+            Object searchCarObject = extras.get(NEW_CAR_MESSAGE_TOKEN);
+            if (searchCarObject != null)
+                activitiIntent.putExtra(NEW_CAR_MESSAGE_TOKEN, searchCarObject.toString());
+            searchCarObject = extras.get(LAST_CAR_MESSAGE_TOKEN);
+            if (searchCarObject != null)
+                activitiIntent.putExtra(LAST_CAR_MESSAGE_TOKEN, searchCarObject.toString());
+            //send broadcast
+            getApplicationContext().sendBroadcast(activitiIntent);
+
+            // This loop represents the service doing some work.
+            // Post notification of received message.
+            if (!ActivitiStateHolder.isActivityVisible())
+                if (extras.containsKey(CHAT_MESSAGE_TOKEN) || extras.containsKey(NEW_CAR_MESSAGE_TOKEN))
+                    sendNotification("Пришло сообщение");
+            Log.i(TAG, "Received: " + extras.toString());
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
         GcmBroadcastReceiver.completeWakefulIntent(intent);

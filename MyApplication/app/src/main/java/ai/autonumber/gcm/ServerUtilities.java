@@ -180,9 +180,9 @@ public final class ServerUtilities {
         post(SERVER_URL + "/newimage", params);
     }
 
-    public static void restoreSearchCarNumber(String regid) throws IOException {
+    public static void restoreLastCarResult(String regid) throws IOException {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("regId", regid);
-        post(SERVER_URL + "/searchNumber", params);
+        post(SERVER_URL + "/lastimage", params);
     }
 }
