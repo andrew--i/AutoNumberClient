@@ -2,13 +2,11 @@
 <resources>
 
     <string name="app_name">AutoNumber</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="camButtonName">Cam</string>
     <string name="chatButtonName">Chat</string>
     <string name="sendButtonName">Send</string>
-    <string name="backButtonName">Back</string>
     <string name="chatInputHint">Say:</string>
-    <string name="searchCarNumberTemplate">Ищем номер машины: </string>
+    <string name="mainButtonName">Main</string>
 
 </resources>

@@ -27,6 +27,10 @@ public class GcmIntentService extends IntentService {
         super("GcmIntentService");
     }
 
+    public static final String CHAT_MESSAGE_TOKEN = "chat-message";
+    public static final String NEW_CAR_MESSAGE_TOKEN = "new-car";
+    public static final String LAST_CAR_MESSAGE_TOKEN = "last-car";
+    public static final String CARS_MESSAGE_TOKEN = "cars";
 
     @Override
     protected void onHandleIntent(final Intent intent) {
@@ -54,13 +58,13 @@ public class GcmIntentService extends IntentService {
                 // If it's a regular GCM message, do some work.
             } else if (GoogleCloudMessaging.
                     MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                Intent activitiIntent = new Intent(GoogleCloudMessageActiviti.INTENT_ACTION);
+                Intent activitiIntent = new Intent(GoogleCloudMessageActivity.INTENT_ACTION);
                 //put whatever data you want to send, if any
-                final String chatMessageKey = "chat-message";
-                final String seatchCarNumberKey = "search-car-number";
-                Object chatMessageObject = extras.get(chatMessageKey);
-                Object searchCarObject = extras.get(seatchCarNumberKey);
-                activitiIntent.putExtra("message", chatMessageObject == null ? "<no message>" : new String(Base64.decode(chatMessageObject.toString(), Base64.DEFAULT)));
+
+
+                Object chatMessageObject = extras.get(CHAT_MESSAGE_TOKEN);
+                Object searchCarObject = extras.get(CHAT_MESSAGE_TOKEN);
+                activitiIntent.putExtra(CHAT_MESSAGE_TOKEN, chatMessageObject == null ? "<no message>" : new String(Base64.decode(chatMessageObject.toString(), Base64.DEFAULT)));
                 if (searchCarObject != null)
                     activitiIntent.putExtra("searchCar", searchCarObject.toString());
                 //send broadcast
@@ -69,7 +73,7 @@ public class GcmIntentService extends IntentService {
                 // This loop represents the service doing some work.
                 // Post notification of received message.
                 if (!ActivitiStateHolder.isActivityVisible())
-                    if (extras.containsKey(chatMessageKey) || extras.containsKey(seatchCarNumberKey))
+                    if (extras.containsKey(CHAT_MESSAGE_TOKEN) || extras.containsKey(NEW_CAR_MESSAGE_TOKEN))
                         sendNotification("Пришло сообщение");
                 Log.i(TAG, "Received: " + extras.toString());
             }

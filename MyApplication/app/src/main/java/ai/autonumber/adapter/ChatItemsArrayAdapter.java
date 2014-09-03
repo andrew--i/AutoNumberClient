@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,7 +31,7 @@ public class ChatItemsArrayAdapter extends ArrayAdapter<ChatMessage> {
     @Override
     public void add(ChatMessage message) {
         for (ChatMessage chatMessage : messages) {
-            if(message.getMessageId().equalsIgnoreCase(chatMessage.getMessageId()))
+            if (message.getMessageId().equalsIgnoreCase(chatMessage.getMessageId()))
                 return;
         }
 
@@ -78,8 +79,13 @@ public class ChatItemsArrayAdapter extends ArrayAdapter<ChatMessage> {
         ImageView userImageView = (ImageView) row.findViewById(R.id.userImage);
         userImageView.setImageResource(message.left ? R.drawable.user1 : R.drawable.user2);
 
-        TextView userMessage = (TextView) row.findViewById(R.id.userMessage);
-        userMessage.setText(message.getUserName());
+        TextView userNameView = (TextView) row.findViewById(R.id.userName);
+        userNameView.setText(message.getUserName());
+
+        TextView messageTime = (TextView) row.findViewById(R.id.time);
+
+        String time = message.getTime();
+        messageTime.setText(time.substring(0, time.lastIndexOf(":")));
 
         LinearLayout chatItemTop = (LinearLayout) row.findViewById(R.id.chatItemTop);
         chatItemTop.setGravity(!message.left ? Gravity.START : Gravity.END);

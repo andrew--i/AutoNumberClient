@@ -1,21 +1,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/searchNumberTextField"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:padding="10dp"
-        android:textSize="20sp"
-        android:text="@string/searchCarNumberTemplate" />
-
     <ImageView
-        android:id="@+id/camPreview"
+        android:id="@+id/imagePreview"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
+        android:background="@color/wallet_bright_foreground_holo_light"
         android:layout_weight="1" />
 
     <ListView

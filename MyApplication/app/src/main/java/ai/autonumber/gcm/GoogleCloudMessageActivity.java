@@ -21,16 +21,14 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;
 
-/**
- * Created by Andrew on 26.08.2014.
- */
-public abstract class GoogleCloudMessageActiviti extends Activity {
+
+public abstract class GoogleCloudMessageActivity extends Activity {
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String TAG = "GoogleCloudMessage";
     private GoogleCloudMessaging gcm;
-    private String regid;
-    protected String userName;
+    public String regid;
+    public String userName;
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
     protected Context context;
@@ -45,8 +43,9 @@ public abstract class GoogleCloudMessageActiviti extends Activity {
         Account[] accounts = AccountManager.get(this).getAccountsByType("com.google");
         if (accounts.length == 0) {
             Toast.makeText(context, "Не удалось определить имя пользователя", Toast.LENGTH_SHORT).show();
-        }
-        userName = accounts[0].name;
+            userName = "unknown_user";
+        } else
+            userName = accounts[0].name;
         // Check device for Play Services APK.
         if (checkPlayServices()) {
             gcm = GoogleCloudMessaging.getInstance(this);
@@ -81,7 +80,7 @@ public abstract class GoogleCloudMessageActiviti extends Activity {
     private SharedPreferences getGCMPreferences(Context context) {
         // This sample app persists the registration ID in shared preferences, but
         // how you store the regID in your app is up to you.
-        return getSharedPreferences(getMainActivitiClassName(), Context.MODE_PRIVATE);
+        return getSharedPreferences(getMainActivityClassName(), Context.MODE_PRIVATE);
     }
 
     private static int getAppVersion(Context context) {
@@ -102,13 +101,18 @@ public abstract class GoogleCloudMessageActiviti extends Activity {
      * shared preferences.
      */
     private void registerInBackground() {
-        runAsync(new Action() {
+
+        (new AsyncTask<Void, Void, Void>() {
             @Override
-            public void doAction() throws IOException {
+            protected Void doInBackground(Void... voids) {
                 if (gcm == null) {
                     gcm = GoogleCloudMessaging.getInstance(context);
                 }
-                regid = gcm.register(SENDER_ID);
+                try {
+                    regid = gcm.register(SENDER_ID);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 // You should send the registration ID to your server over HTTP,
                 // so it can use GCM/HTTP or CCS to send messages to your app.
@@ -122,8 +126,9 @@ public abstract class GoogleCloudMessageActiviti extends Activity {
 
                 // Persist the regID - no need to register again.
                 storeRegistrationId(context, regid);
+                return null;
             }
-        });
+        }).execute();
     }
 
     /**
@@ -153,7 +158,7 @@ public abstract class GoogleCloudMessageActiviti extends Activity {
         editor.apply();
     }
 
-    protected abstract String getMainActivitiClassName();
+    protected abstract String getMainActivityClassName();
 
     @Override
     protected void onResume() {
@@ -188,22 +193,13 @@ public abstract class GoogleCloudMessageActiviti extends Activity {
         return true;
     }
 
-    protected void sendMessage(final String message) {
-        runAsync(new Action() {
-            @Override
-            public void doAction() throws IOException {
-                ServerUtilities.chatMessage(message, regid);
-            }
-        });
-    }
-
 
     //This is the handler that will manager to process the broadcast intent
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Extract data included in the Intent
-            String message = intent.getStringExtra("message");
+            String message = intent.getStringExtra(GcmIntentService.CHAT_MESSAGE_TOKEN);
             handleChatMessage(message);
             String searchCarNumber = intent.getStringExtra("search-car-number");
             if (searchCarNumber != null)
@@ -215,50 +211,4 @@ public abstract class GoogleCloudMessageActiviti extends Activity {
 
     protected abstract void handleChatMessage(String message);
 
-    protected void restoreChatMessages() {
-
-        runAsync(new Action() {
-            @Override
-            public void doAction() throws IOException {
-                ServerUtilities.restoreChatMessages(regid, 0);
-            }
-        });
-    }
-
-    protected void restoreSearchCarNumber() {
-        runAsync(new Action() {
-            @Override
-            public void doAction() throws IOException {
-                ServerUtilities.restoreSearchCarNumber(regid);
-            }
-        });
-    }
-
-
-    protected void sendImage(final byte[] byteArray) {
-        runAsync(new Action() {
-            @Override
-            public void doAction() throws IOException {
-                ServerUtilities.sendNewGameResultImage(regid, byteArray);
-            }
-        });
-    }
-
-    interface Action {
-        void doAction() throws IOException;
-    }
-
-    private void runAsync(final Action action) {
-        new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] params) {
-                try {
-                    action.doAction();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        }.execute(null, null, null);
-    }
 }
