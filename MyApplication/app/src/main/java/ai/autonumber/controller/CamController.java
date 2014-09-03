@@ -72,7 +72,7 @@ public class CamController extends Controller {
         chatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                controllerManager.setMainControllerActice();
+                controllerManager.setMainControllerActive();
             }
         });
     }

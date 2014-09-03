@@ -13,7 +13,6 @@ import java.io.Serializable;
 public class CarMessage implements Serializable {
     private String id;
     private String userId;
-    private Bitmap bitmap;
     private String time;
     private String userName;
 
@@ -32,14 +31,6 @@ public class CarMessage implements Serializable {
 
     public void setUserId(String userId) {
         this.userId = userId;
-    }
-
-    public Bitmap getBitmap() {
-        return bitmap;
-    }
-
-    public void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
     }
 
     public String getTime() {
@@ -64,14 +55,6 @@ public class CarMessage implements Serializable {
             CarMessage carMessage = new CarMessage();
             carMessage.id = jsonObject.getString("id");
             carMessage.userName = jsonObject.getString("userName");
-
-            try {
-                byte[] decodedByte = Base64.decode(jsonObject.getString("result"), Base64.DEFAULT);
-                carMessage.setBitmap(BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length));
-            } catch (Exception e) {
-                carMessage.setBitmap(null);
-            }
-
             carMessage.setUserId(jsonObject.getString("userId"));
             carMessage.setTime(jsonObject.getString("time"));
             return carMessage;

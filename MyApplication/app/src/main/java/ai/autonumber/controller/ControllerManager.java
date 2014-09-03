@@ -83,7 +83,7 @@ public class ControllerManager {
         camController.pauseController();
     }
 
-    public void setMainControllerActice() {
+    public void setMainControllerActive() {
         setActiveController(mainController);
     }
 

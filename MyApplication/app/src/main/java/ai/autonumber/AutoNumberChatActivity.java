@@ -59,10 +59,13 @@ public class AutoNumberChatActivity extends GoogleCloudMessageActivity {
         if (requestCode == MainController.PHOTO_INTENT_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 controllerManager.setCamControllerActive();
-            } else if (resultCode == RESULT_CANCELED)
+            } else if (resultCode == RESULT_CANCELED) {
+                controllerManager.setMainControllerActive();
                 Toast.makeText(this, "Capture cancelled", Toast.LENGTH_LONG).show();
-            else
+            } else {
+                controllerManager.setMainControllerActive();
                 Toast.makeText(this, "Capture failed", Toast.LENGTH_LONG).show();
+            }
         }
     }
 

@@ -22,6 +22,7 @@ import ai.autonumber.AutoNumberChatActivity;
 import ai.autonumber.R;
 import ai.autonumber.gcm.ServerUtilities;
 import ai.autonumber.model.CarMessage;
+import ai.autonumber.util.DownloadImageTask;
 
 public class MainController extends Controller {
 
@@ -108,8 +109,10 @@ public class MainController extends Controller {
         ImageView imageView = (ImageView) activity.findViewById(R.id.imagePreview);
         if (lastCarMessage == null)
             imageView.setImageBitmap(null);
-        else
-            imageView.setImageBitmap(lastCarMessage.getBitmap());
+        else {
+            String id = lastCarMessage.getId();
+            new DownloadImageTask(imageView).execute(ServerUtilities.SERVER_URL + "/getimage?id=" + id);
+        }
     }
 
     @Override
