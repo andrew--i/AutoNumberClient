@@ -23,13 +23,12 @@ import java.io.File;
 
 import ai.autonumber.adapter.ChatItemsArrayAdapter;
 import ai.autonumber.gcm.GoogleCloudMessageActiviti;
-import ai.autonumber.gcm.ServerUtilities;
 import ai.autonumber.model.ChatMessage;
 import ai.autonumber.state.ActivitiState;
 import ai.autonumber.state.ActivitiStateHolder;
 
 
-public class CameraTestActivity extends GoogleCloudMessageActiviti {
+public class AutoNumberChatActivity extends GoogleCloudMessageActiviti {
     private static final int PHOTO_INTENT_REQUEST_CODE = 123;
     private Uri mUri;
     private ActivitiState currentActivitiState;
@@ -97,7 +96,7 @@ public class CameraTestActivity extends GoogleCloudMessageActiviti {
 
     @Override
     protected String getMainActivitiClassName() {
-        return CameraTestActivity.class.getSimpleName();
+        return AutoNumberChatActivity.class.getSimpleName();
     }
 
     private void addChatMessageFromInput() {

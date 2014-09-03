@@ -12,7 +12,7 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import ai.autonumber.CameraTestActivity;
+import ai.autonumber.AutoNumberChatActivity;
 import ai.autonumber.R;
 import ai.autonumber.state.ActivitiStateHolder;
 
@@ -86,7 +86,7 @@ public class GcmIntentService extends IntentService {
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, CameraTestActivity.class), 0);
+                new Intent(this, AutoNumberChatActivity.class), 0);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
