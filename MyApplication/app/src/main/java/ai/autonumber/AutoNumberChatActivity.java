@@ -1,5 +1,7 @@
 package ai.autonumber;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -73,6 +75,10 @@ public class AutoNumberChatActivity extends GoogleCloudMessageActivity {
     protected void onResume() {
         super.onResume();
         ActivitiStateHolder.activityResumed();
+        final NotificationManager mNotificationManager = (NotificationManager)
+                this.getSystemService(Context.NOTIFICATION_SERVICE);
+        if(mNotificationManager != null)
+            mNotificationManager.cancelAll();
         controllerManager.resumeControllers();
     }
 
