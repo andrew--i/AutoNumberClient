@@ -17,7 +17,6 @@ public class ControllerManager {
     private MainController mainController;
     private CarListController carListController;
     private ChatController chatController;
-    private CamController camController;
 
     private Controller activeController = null;
 
@@ -26,7 +25,6 @@ public class ControllerManager {
         mainController = new MainController(activity, this);
         carListController = new CarListController(activity, this);
         chatController = new ChatController(activity, this);
-        camController = new CamController(activity, this);
     }
 
     public boolean isActiveController(Controller controller) {
@@ -63,24 +61,16 @@ public class ControllerManager {
         chatController.handleChatMessage(message, isCurrentUser);
     }
 
-    public void setCamControllerActive() {
-        setActiveController(camController);
-        camController.updateImage(mainController.getImageFile());
-
-    }
-
     public void resumeControllers() {
         mainController.resumeController();
         carListController.resumeController();
         chatController.resumeController();
-        camController.resumeController();
     }
 
     public void pauseControllers() {
         mainController.pauseController();
         carListController.pauseController();
         chatController.pauseController();
-        camController.pauseController();
     }
 
     public void setMainControllerActive() {
@@ -101,5 +91,9 @@ public class ControllerManager {
 
     public void handleLastCarMessage(CarMessage carMessage) {
         mainController.handleCarMessage(carMessage);
+    }
+
+    public void sendImageToServer() {
+        mainController.sendImageToServer();
     }
 }

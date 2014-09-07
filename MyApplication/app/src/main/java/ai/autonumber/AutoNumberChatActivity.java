@@ -60,13 +60,14 @@ public class AutoNumberChatActivity extends GoogleCloudMessageActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == MainController.PHOTO_INTENT_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                controllerManager.setCamControllerActive();
+                controllerManager.sendImageToServer();
+                controllerManager.setMainControllerActive();
             } else if (resultCode == RESULT_CANCELED) {
                 controllerManager.setMainControllerActive();
-                Toast.makeText(this, "Capture cancelled", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Снимок отменен", Toast.LENGTH_LONG).show();
             } else {
                 controllerManager.setMainControllerActive();
-                Toast.makeText(this, "Capture failed", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Ошибка при получении снимка", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -77,7 +78,7 @@ public class AutoNumberChatActivity extends GoogleCloudMessageActivity {
         ActivitiStateHolder.activityResumed();
         final NotificationManager mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
-        if(mNotificationManager != null)
+        if (mNotificationManager != null)
             mNotificationManager.cancelAll();
         controllerManager.resumeControllers();
     }

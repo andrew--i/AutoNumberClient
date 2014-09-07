@@ -2,6 +2,7 @@ package ai.autonumber.controller;
 
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -95,10 +97,6 @@ public class MainController extends Controller {
         return Arrays.asList(R.id.imagePreview, R.id.chatButton, R.id.camButton);
     }
 
-    public Uri getImageFile() {
-        return mUri;
-    }
-
     public void handleCarMessage(CarMessage carMessage) {
         lastCarMessage = carMessage;
         if (controllerManager.isActiveController(thisController()))
@@ -125,6 +123,25 @@ public class MainController extends Controller {
             @Override
             public void doAction() throws IOException {
                 ServerUtilities.restoreLastCarResult(activity.regid);
+            }
+        });
+    }
+
+    public void sendImageToServer() {
+        ImageView imageView = (ImageView) findViewById(R.id.imagePreview);
+        imageView.setDrawingCacheEnabled(true);
+        Bitmap bitmap = imageView.getDrawingCache();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        sendImage(byteArray);
+    }
+
+    private void sendImage(final byte[] byteArray) {
+        runAsync(new Action() {
+            @Override
+            public void doAction() throws IOException {
+                ServerUtilities.sendNewGameResultImage(activity.regid, byteArray);
             }
         });
     }
