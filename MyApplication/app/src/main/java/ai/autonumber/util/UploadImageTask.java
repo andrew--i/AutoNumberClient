@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -24,8 +23,8 @@ public class UploadImageTask extends AsyncTask<UploadTaskParam, Void, String> {
     }
 
     private String upload(UploadTaskParam taskParam) {
-        HttpURLConnection conn = null;
-        DataOutputStream dos = null;
+        HttpURLConnection conn;
+        DataOutputStream dos;
         String lineEnd = "\r\n";
         String twoHyphens = "--";
         String boundary = "*****";
@@ -122,6 +121,9 @@ public class UploadImageTask extends AsyncTask<UploadTaskParam, Void, String> {
                         + e.getMessage(), e);
             }
             dialog.dismiss();
+            File file = new File(taskParam.getUri().getPath());
+            if (file.exists())
+                file.deleteOnExit();
             return message;
 
         } // End else block
