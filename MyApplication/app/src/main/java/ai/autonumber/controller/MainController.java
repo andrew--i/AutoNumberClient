@@ -1,11 +1,13 @@
 package ai.autonumber.controller;
 
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -25,6 +27,8 @@ import ai.autonumber.R;
 import ai.autonumber.gcm.ServerUtilities;
 import ai.autonumber.model.CarMessage;
 import ai.autonumber.util.DownloadImageTask;
+import ai.autonumber.util.UploadImageTask;
+import ai.autonumber.util.UploadTaskParam;
 
 public class MainController extends Controller {
 
@@ -128,21 +132,7 @@ public class MainController extends Controller {
     }
 
     public void sendImageToServer() {
-        ImageView imageView = (ImageView) findViewById(R.id.imagePreview);
-        imageView.setDrawingCacheEnabled(true);
-        Bitmap bitmap = imageView.getDrawingCache();
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
-        sendImage(byteArray);
-    }
-
-    private void sendImage(final byte[] byteArray) {
-        runAsync(new Action() {
-            @Override
-            public void doAction() throws IOException {
-                ServerUtilities.sendNewGameResultImage(activity.regid, byteArray);
-            }
-        });
+        UploadTaskParam taskParam = new UploadTaskParam(mUri, ProgressDialog.show(activity.getApplicationContext(), "Загрузка", "Загрузка изображения"), ServerUtilities.SERVER_URL + "/newimage");
+        new UploadImageTask().execute(taskParam);
     }
 }
