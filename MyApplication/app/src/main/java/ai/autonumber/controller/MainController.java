@@ -132,7 +132,10 @@ public class MainController extends Controller {
     }
 
     public void sendImageToServer() {
-        UploadTaskParam taskParam = new UploadTaskParam(mUri, ProgressDialog.show(activity.getApplicationContext(), "Загрузка", "Загрузка изображения"), ServerUtilities.SERVER_URL + "/newimage");
+        UploadTaskParam taskParam = new UploadTaskParam(mUri,
+                ProgressDialog.show(activity.getApplicationContext(), "Загрузка", "Загрузка изображения"),
+                ServerUtilities.SERVER_URL + "/newimage",
+                activity.regid);
         new UploadImageTask().execute(taskParam);
     }
 }
