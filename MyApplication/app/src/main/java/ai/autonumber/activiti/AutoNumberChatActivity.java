@@ -1,18 +1,21 @@
-package ai.autonumber;
+package ai.autonumber.activiti;
 
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
+import ai.autonumber.R;
 import ai.autonumber.controller.ControllerManager;
 import ai.autonumber.controller.MainController;
 import ai.autonumber.gcm.GoogleCloudMessageActivity;
 import ai.autonumber.model.CarMessage;
 import ai.autonumber.model.ChatMessage;
-import ai.autonumber.state.ActivitiStateHolder;
+import ai.autonumber.model.User;
+import ai.autonumber.state.AppStateHolder;
 
 
 public class AutoNumberChatActivity extends GoogleCloudMessageActivity {
@@ -24,6 +27,7 @@ public class AutoNumberChatActivity extends GoogleCloudMessageActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.auto_number_activiti);
         controllerManager = new ControllerManager(this);
+        controllerManager.setMainControllerActive();
     }
 
 
@@ -35,7 +39,7 @@ public class AutoNumberChatActivity extends GoogleCloudMessageActivity {
 
     @Override
     protected void handleChatMessage(ChatMessage message) {
-        controllerManager.handleChatMessage(message, userName.equalsIgnoreCase(message.getUserName()));
+        controllerManager.handleChatMessage(message);
     }
 
     @Override
@@ -50,11 +54,31 @@ public class AutoNumberChatActivity extends GoogleCloudMessageActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.camera_test, menu);
+        getMenuInflater().inflate(R.menu.autonumbermenu, menu);
         return true;
     }
 
+    @Override
+    protected void handleChangeCurrentUser() {
+        controllerManager.handleChangeCurrentUser();
+    }
+
+    @Override
+    protected void handleChangeUserInfo(User user) {
+        controllerManager.handleChangeUserInfo(user);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.userMenuItem:
+                startActivity(new Intent(this, UserMenuActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -75,7 +99,7 @@ public class AutoNumberChatActivity extends GoogleCloudMessageActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        ActivitiStateHolder.activityResumed();
+        AppStateHolder.mainActivityResumed();
         final NotificationManager mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
         if (mNotificationManager != null)
@@ -87,7 +111,7 @@ public class AutoNumberChatActivity extends GoogleCloudMessageActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        ActivitiStateHolder.activityPaused();
+        AppStateHolder.mainActivityPaused();
         controllerManager.pauseControllers();
     }
 }

@@ -3,26 +3,22 @@ package ai.autonumber.controller;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import ai.autonumber.AutoNumberChatActivity;
+import ai.autonumber.activiti.AutoNumberChatActivity;
 import ai.autonumber.R;
 import ai.autonumber.gcm.ServerUtilities;
 import ai.autonumber.model.CarMessage;
@@ -38,7 +34,6 @@ public class MainController extends Controller {
 
     public MainController(final AutoNumberChatActivity activity, final ControllerManager controllerManager) {
         super(activity, controllerManager);
-        controllerManager.setActiveController(this);
     }
 
     private Uri generateFileUri() {
@@ -60,7 +55,7 @@ public class MainController extends Controller {
 
 
     @Override
-    protected void initAsActiveController() {
+    protected void onHandleStartActive() {
 
         final Button camButton = (Button) findViewById(R.id.camButton);
         final Button chatButton = (Button) findViewById(R.id.chatButton);
@@ -94,6 +89,11 @@ public class MainController extends Controller {
         });
 
         updateCarPreview();
+    }
+
+    @Override
+    protected void onHandleEndActive() {
+
     }
 
     @Override

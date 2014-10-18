@@ -21,8 +21,11 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;
 
+import ai.autonumber.controller.Controller;
 import ai.autonumber.model.CarMessage;
 import ai.autonumber.model.ChatMessage;
+import ai.autonumber.model.User;
+import ai.autonumber.state.AppStateHolder;
 
 
 public abstract class GoogleCloudMessageActivity extends Activity {
@@ -31,7 +34,7 @@ public abstract class GoogleCloudMessageActivity extends Activity {
     private static final String TAG = "GoogleCloudMessage";
     private GoogleCloudMessaging gcm;
     public String regid;
-    public String userName;
+    private String deviceUserName;
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
     protected Context context;
@@ -46,16 +49,22 @@ public abstract class GoogleCloudMessageActivity extends Activity {
         Account[] accounts = AccountManager.get(this).getAccountsByType("com.google");
         if (accounts.length == 0) {
             Toast.makeText(context, "Не удалось определить имя пользователя", Toast.LENGTH_SHORT).show();
-            userName = "unknown_user";
+            deviceUserName = "unknown_user";
         } else
-            userName = accounts[0].name;
+            deviceUserName = accounts[0].name;
         // Check device for Play Services APK.
         if (checkPlayServices()) {
             gcm = GoogleCloudMessaging.getInstance(this);
             regid = getRegistrationId(this);
-
             if (regid.isEmpty()) {
                 registerInBackground();
+            } else {
+                Controller.runAsync(new Controller.Action() {
+                    @Override
+                    public void doAction() throws IOException {
+                        ServerUtilities.getCurrentUser(regid);
+                    }
+                });
             }
         } else
             Log.i(TAG, "No valid Google Play Services APK found.");
@@ -141,7 +150,7 @@ public abstract class GoogleCloudMessageActivity extends Activity {
      * using the 'from' address in the message.
      */
     private void sendRegistrationIdToBackend() {
-        ServerUtilities.register(regid, userName);
+        ServerUtilities.register(regid, deviceUserName);
     }
 
     /**
@@ -222,6 +231,26 @@ public abstract class GoogleCloudMessageActivity extends Activity {
                     handleLastCarMessage(carMessage);
             }
 
+            String currentUserMessage = intent.getStringExtra(GcmIntentService.CURRENT_USER_MESSAGE_TOKEN);
+            if (currentUserMessage != null) {
+                User user = User.fromJson(currentUserMessage);
+                if (user != null) {
+                    AppStateHolder.currentUser = user;
+                    handleChangeCurrentUser();
+                }
+            }
+
+            String userInfoChangedMessage = intent.getStringExtra(GcmIntentService.USER_INFO_CHANGED_MESSAGE_TOKEN);
+            if (userInfoChangedMessage != null) {
+                User user = User.fromJson(userInfoChangedMessage);
+                if (user != null) {
+                    if (user.getRegId().equals(regid)) {
+                        AppStateHolder.currentUser = user;
+                        handleChangeCurrentUser();
+                    }
+                    handleChangeUserInfo(user);
+                }
+            }
         }
     };
 
@@ -230,5 +259,9 @@ public abstract class GoogleCloudMessageActivity extends Activity {
     protected abstract void handleNewCarMessage(CarMessage carMessage);
 
     protected abstract void handleChatMessage(ChatMessage chatMessage);
+
+    protected abstract void handleChangeCurrentUser();
+
+    protected abstract void handleChangeUserInfo(User user);
 
 }

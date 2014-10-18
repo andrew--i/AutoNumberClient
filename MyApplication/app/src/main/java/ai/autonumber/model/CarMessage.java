@@ -1,9 +1,5 @@
 package ai.autonumber.model;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,9 +8,8 @@ import java.io.Serializable;
 
 public class CarMessage implements Serializable {
     private String id;
-    private String userId;
+    private User user;
     private String time;
-    private String userName;
 
 
     public String getId() {
@@ -25,14 +20,6 @@ public class CarMessage implements Serializable {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     public String getTime() {
         return time;
     }
@@ -41,12 +28,8 @@ public class CarMessage implements Serializable {
         this.time = time;
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public User getUser() {
+        return user;
     }
 
     public static CarMessage fromJson(String text) {
@@ -54,8 +37,7 @@ public class CarMessage implements Serializable {
             JSONObject jsonObject = new JSONObject(text);
             CarMessage carMessage = new CarMessage();
             carMessage.id = jsonObject.getString("id");
-            carMessage.userName = jsonObject.getString("userName");
-            carMessage.setUserId(jsonObject.getString("userId"));
+            carMessage.user = User.fromJson(jsonObject.getString("user"));
             carMessage.setTime(jsonObject.getString("time"));
             return carMessage;
         } catch (JSONException e) {

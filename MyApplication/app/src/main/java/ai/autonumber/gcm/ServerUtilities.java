@@ -38,7 +38,8 @@ public final class ServerUtilities {
     private static final int MAX_ATTEMPTS = 5;
     private static final int BACKOFF_MILLI_SECONDS = 2000;
     private static final Random random = new Random();
-    public static final String SERVER_URL = "http://autonumber.herokuapp.com";
+        public static final String SERVER_URL = "http://autonumber.herokuapp.com";
+//    public static final String SERVER_URL = "http://192.168.1.5:8080";
     private static final String TAG = "ServerUtilities";
 
     /**
@@ -173,16 +174,22 @@ public final class ServerUtilities {
         post(SERVER_URL + "/messages", params);
     }
 
-    public static void sendNewGameResultImage(String regid, byte[] byteArray) throws IOException {
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put("image", Base64.encodeToString(byteArray, Base64.DEFAULT));
-        params.put("regId", regid);
-        post(SERVER_URL + "/newimage", params);
-    }
-
     public static void restoreLastCarResult(String regid) throws IOException {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("regId", regid);
         post(SERVER_URL + "/lastimage", params);
+    }
+
+    public static void getCurrentUser(String regid) throws IOException {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("regId", regid);
+        post(SERVER_URL + "/current_user", params);
+    }
+
+    public static void changeCurrentUserName(String userId, String humanName) throws IOException {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("userId", userId);
+        params.put("humanName", Base64.encodeToString(humanName.getBytes(Charset.forName("utf-8")), Base64.DEFAULT));
+        post(SERVER_URL + "/change_user_name", params);
     }
 }

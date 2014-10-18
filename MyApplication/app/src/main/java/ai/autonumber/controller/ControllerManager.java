@@ -6,25 +6,27 @@ import android.view.View;
 import java.util.Arrays;
 import java.util.List;
 
-import ai.autonumber.AutoNumberChatActivity;
+import ai.autonumber.activiti.AutoNumberChatActivity;
 import ai.autonumber.R;
 import ai.autonumber.model.CarMessage;
 import ai.autonumber.model.ChatMessage;
+import ai.autonumber.model.User;
+import ai.autonumber.state.AppStateHolder;
 
 
 public class ControllerManager {
-    private Activity activity;
-    private MainController mainController;
-    private CarListController carListController;
-    private ChatController chatController;
-
+    private final Activity activity;
+    private final MainController mainController;
+    private final ChatController chatController;
+    private final List<Controller> controllers;
     private Controller activeController = null;
+
 
     public ControllerManager(AutoNumberChatActivity activity) {
         this.activity = activity;
-        mainController = new MainController(activity, this);
-        carListController = new CarListController(activity, this);
         chatController = new ChatController(activity, this);
+        mainController = new MainController(activity, this);
+        controllers = Arrays.asList(mainController, chatController);
     }
 
     public boolean isActiveController(Controller controller) {
@@ -35,7 +37,12 @@ public class ControllerManager {
         this.activeController = activeController;
         hideAllControls();
         setVisibleControllerControls(activeController.getUsingControlsIds());
-        activeController.initAsActiveController();
+        activeController.onHandleStartActive();
+        for (Controller controller : controllers) {
+            if (activeController == controller)
+                continue;
+            controller.onHandleEndActive();
+        }
     }
 
     private void setVisibleControllerControls(List<Integer> usingControlsIds) {
@@ -57,20 +64,20 @@ public class ControllerManager {
 
     }
 
-    public void handleChatMessage(ChatMessage message, boolean isCurrentUser) {
-        chatController.handleChatMessage(message, isCurrentUser);
+    public void handleChatMessage(ChatMessage message) {
+        chatController.handleChatMessage(message);
     }
 
     public void resumeControllers() {
-        mainController.resumeController();
-        carListController.resumeController();
-        chatController.resumeController();
+        for (Controller controller : controllers) {
+            controller.resumeController();
+        }
     }
 
     public void pauseControllers() {
-        mainController.pauseController();
-        carListController.pauseController();
-        chatController.pauseController();
+        for (Controller controller : controllers) {
+            controller.pauseController();
+        }
     }
 
     public void setMainControllerActive() {
@@ -79,10 +86,6 @@ public class ControllerManager {
 
     public void setChatControllerActive() {
         setActiveController(chatController);
-    }
-
-    public void setActiveMainController() {
-        setActiveController(mainController);
     }
 
     public void handleNewCarMessage(CarMessage carMessage) {
@@ -95,5 +98,13 @@ public class ControllerManager {
 
     public void sendImageToServer() {
         mainController.sendImageToServer();
+    }
+
+    public void handleChangeCurrentUser() {
+        chatController.handleChangeUserInfo(AppStateHolder.currentUser);
+    }
+
+    public void handleChangeUserInfo(User user) {
+        chatController.handleChangeUserInfo(user);
     }
 }

@@ -12,9 +12,9 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import ai.autonumber.AutoNumberChatActivity;
+import ai.autonumber.activiti.AutoNumberChatActivity;
 import ai.autonumber.R;
-import ai.autonumber.state.ActivitiStateHolder;
+import ai.autonumber.state.AppStateHolder;
 
 /**
  * Created by Andrew on 26.08.2014.
@@ -31,6 +31,8 @@ public class GcmIntentService extends IntentService {
     public static final String NEW_CAR_MESSAGE_TOKEN = "new-car";
     public static final String LAST_CAR_MESSAGE_TOKEN = "last-car";
     public static final String CARS_MESSAGE_TOKEN = "cars";
+    public static final String CURRENT_USER_MESSAGE_TOKEN = "current_user";
+    public static final String USER_INFO_CHANGED_MESSAGE_TOKEN = "user_info_changed";
 
     @Override
     protected void onHandleIntent(final Intent intent) {
@@ -63,7 +65,6 @@ public class GcmIntentService extends IntentService {
 
 
             Object chatMessageObject = extras.get(CHAT_MESSAGE_TOKEN);
-
             if (chatMessageObject != null)
                 activitiIntent.putExtra(CHAT_MESSAGE_TOKEN, new String(Base64.decode(chatMessageObject.toString(), Base64.DEFAULT)));
             Object searchCarObject = extras.get(NEW_CAR_MESSAGE_TOKEN);
@@ -72,12 +73,18 @@ public class GcmIntentService extends IntentService {
             searchCarObject = extras.get(LAST_CAR_MESSAGE_TOKEN);
             if (searchCarObject != null)
                 activitiIntent.putExtra(LAST_CAR_MESSAGE_TOKEN, searchCarObject.toString());
+            final Object currentUserObject = extras.get(CURRENT_USER_MESSAGE_TOKEN);
+            if (currentUserObject != null)
+                activitiIntent.putExtra(CURRENT_USER_MESSAGE_TOKEN, currentUserObject.toString());
+            Object userInfoChangedUserObject = extras.get(USER_INFO_CHANGED_MESSAGE_TOKEN);
+            if (userInfoChangedUserObject != null)
+                activitiIntent.putExtra(USER_INFO_CHANGED_MESSAGE_TOKEN, userInfoChangedUserObject.toString());
             //send broadcast
             getApplicationContext().sendBroadcast(activitiIntent);
 
             // This loop represents the service doing some work.
             // Post notification of received message.
-            if (!ActivitiStateHolder.isActivityVisible())
+            if (!AppStateHolder.isMainActivityVisible())
                 if (extras.containsKey(CHAT_MESSAGE_TOKEN) || extras.containsKey(NEW_CAR_MESSAGE_TOKEN))
                     sendNotification("Пришло сообщение");
             Log.i(TAG, "Received: " + extras.toString());

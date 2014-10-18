@@ -1,14 +1,13 @@
 package ai.autonumber.controller;
 
 
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.view.View;
 
 import java.io.IOException;
 import java.util.List;
 
-import ai.autonumber.AutoNumberChatActivity;
+import ai.autonumber.activiti.AutoNumberChatActivity;
 
 public abstract class Controller {
     protected AutoNumberChatActivity activity;
@@ -19,14 +18,16 @@ public abstract class Controller {
         this.controllerManager = controllerManager;
     }
 
-    protected abstract void initAsActiveController();
+    protected abstract void onHandleStartActive();
+
+    protected abstract void onHandleEndActive();
 
     protected View findViewById(int id) {
         return activity.findViewById(id);
     }
 
 
-    protected void runAsync(final Action action) {
+    public static void runAsync(final Action action) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void[] params) {
@@ -54,7 +55,7 @@ public abstract class Controller {
 
     public abstract List<Integer> getUsingControlsIds();
 
-    interface Action {
+    public interface Action {
         void doAction() throws IOException;
     }
 }

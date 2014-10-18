@@ -13,11 +13,12 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import ai.autonumber.AutoNumberChatActivity;
+import ai.autonumber.activiti.AutoNumberChatActivity;
 import ai.autonumber.R;
 import ai.autonumber.adapter.ChatItemsArrayAdapter;
 import ai.autonumber.gcm.ServerUtilities;
 import ai.autonumber.model.ChatMessage;
+import ai.autonumber.model.User;
 
 public class ChatController extends Controller {
     public ChatController(AutoNumberChatActivity activity, final ControllerManager controllerManager) {
@@ -37,7 +38,7 @@ public class ChatController extends Controller {
     }
 
     @Override
-    protected void initAsActiveController() {
+    protected void onHandleStartActive() {
 
         final Button camButton = (Button) findViewById(R.id.camButton);
         final Button chatButton = (Button) findViewById(R.id.chatButton);
@@ -69,16 +70,26 @@ public class ChatController extends Controller {
         camButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                controllerManager.setActiveMainController();
+                controllerManager.setMainControllerActive();
             }
         });
     }
 
+    @Override
+    protected void onHandleEndActive() {
 
-    public void handleChatMessage(ChatMessage message, boolean isCurrentUser) {
-        message.left = isCurrentUser;
-        ListView chatView = (ListView) findViewById(R.id.chatView);
+    }
+
+
+    public void handleChatMessage(ChatMessage message) {
+        final ListView chatView = (ListView) findViewById(R.id.chatView);
         ((ChatItemsArrayAdapter) chatView.getAdapter()).add(message);
+        chatView.post(new Runnable() {
+            @Override
+            public void run() {
+                chatView.setSelection(chatView.getAdapter().getCount() - 1);
+            }
+        });
     }
 
     private void addChatMessageFromInput() {
@@ -112,4 +123,13 @@ public class ChatController extends Controller {
         });
     }
 
+    public void handleChangeUserInfo(final User user) {
+        final ListView chatView = (ListView) findViewById(R.id.chatView);
+        chatView.post(new Runnable() {
+            @Override
+            public void run() {
+                ((ChatItemsArrayAdapter) chatView.getAdapter()).updateUserMessages(user);
+            }
+        });
+    }
 }
