@@ -1,9 +1,10 @@
 package ai.autonumber.util;
 
 import android.app.ProgressDialog;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.provider.MediaStore;
 import android.util.Log;
 
 import java.io.ByteArrayInputStream;
@@ -42,7 +43,11 @@ public class UploadImageTask extends AsyncTask<UploadTaskParam, Void, String> {
         {
             try {
 
-                final Bitmap bitmap = MediaStore.Images.Media.getBitmap(taskParam.getContentResolver(), taskParam.getUri());
+                final BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 4;
+                final AssetFileDescriptor fileDescriptor = taskParam.getContentResolver().openAssetFileDescriptor( taskParam.getUri(), "r");
+
+                final Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor.getFileDescriptor(), null, options);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
 
