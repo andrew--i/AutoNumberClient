@@ -28,8 +28,6 @@ public class ChatController extends Controller {
         ListView chatView = (ListView) findViewById(R.id.chatView);
         ChatItemsArrayAdapter adapter = new ChatItemsArrayAdapter(activity.getApplicationContext(), R.layout.chat_item);
         chatView.setAdapter(adapter);
-
-
     }
 
     @Override

@@ -192,4 +192,10 @@ public final class ServerUtilities {
         params.put("humanName", Base64.encodeToString(humanName.getBytes(Charset.forName("utf-8")), Base64.DEFAULT));
         post(SERVER_URL + "/change_user_name", params);
     }
+
+    public static void restoreAllPhotos(String regId) throws IOException {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("regId", regId);
+        post(SERVER_URL + "/imagesids", params);
+    }
 }

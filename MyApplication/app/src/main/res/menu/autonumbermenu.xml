@@ -4,4 +4,7 @@
     <item
         android:id="@+id/userMenuItem"
         android:title="@string/userMenuItemName" />
+    <item
+        android:id="@+id/photosMenuItem"
+        android:title="@string/photosMenuItemName" />
 </menu>

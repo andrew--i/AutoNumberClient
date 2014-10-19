@@ -74,6 +74,9 @@ public class AutoNumberChatActivity extends GoogleCloudMessageActivity {
             case R.id.userMenuItem:
                 startActivity(new Intent(this, UserMenuActivity.class));
                 return true;
+            case R.id.photosMenuItem:
+                startActivity(new Intent(this, PhotosListActivity.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

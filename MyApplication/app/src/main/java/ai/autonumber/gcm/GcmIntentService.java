@@ -79,6 +79,9 @@ public class GcmIntentService extends IntentService {
             Object userInfoChangedUserObject = extras.get(USER_INFO_CHANGED_MESSAGE_TOKEN);
             if (userInfoChangedUserObject != null)
                 activitiIntent.putExtra(USER_INFO_CHANGED_MESSAGE_TOKEN, userInfoChangedUserObject.toString());
+            Object carsMessageObject = extras.get(CARS_MESSAGE_TOKEN);
+            if (carsMessageObject != null)
+                activitiIntent.putExtra(CARS_MESSAGE_TOKEN, carsMessageObject.toString());
             //send broadcast
             getApplicationContext().sendBroadcast(activitiIntent);
 

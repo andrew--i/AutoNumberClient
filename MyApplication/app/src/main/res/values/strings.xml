@@ -9,7 +9,9 @@
     <string name="chatInputHint">Say:</string>
     <string name="userNameHint">type user name</string>
     <string name="mainButtonName">Main</string>
-    <string name="userMenuItemName">User</string>
+    <string name="userMenuItemName">User Preferences</string>
     <string name="userNameSetupButtonName">Accept</string>
+    <string name="photosMenuItemName">All Photos</string>
+    <string name="clearCacheItemName">Clear Cache</string>
 
 </resources>
