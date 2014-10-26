@@ -20,6 +20,7 @@ import java.util.List;
 
 import ai.autonumber.activiti.AutoNumberChatActivity;
 import ai.autonumber.R;
+import ai.autonumber.cache.FileCache;
 import ai.autonumber.gcm.ServerUtilities;
 import ai.autonumber.model.CarMessage;
 import ai.autonumber.util.DownloadImageForImageViewTask;
@@ -31,9 +32,11 @@ public class MainController extends Controller {
     public static final int PHOTO_INTENT_REQUEST_CODE = 123;
     private Uri mUri;
     private CarMessage lastCarMessage;
+    private FileCache fileCache;
 
     public MainController(final AutoNumberChatActivity activity, final ControllerManager controllerManager) {
         super(activity, controllerManager);
+        fileCache = new FileCache(activity.getApplicationContext());
     }
 
     private Uri generateFileUri() {
@@ -113,7 +116,7 @@ public class MainController extends Controller {
             imageView.setImageBitmap(null);
         else {
             String id = lastCarMessage.getId();
-            new DownloadImageForImageViewTask(imageView).execute(ServerUtilities.SERVER_URL + "/getimage?id=" + id);
+            new DownloadImageForImageViewTask(imageView, fileCache).execute(id);
         }
     }
 

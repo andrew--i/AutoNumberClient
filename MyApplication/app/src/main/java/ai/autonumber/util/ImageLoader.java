@@ -45,10 +45,7 @@ public class ImageLoader {
 
     public ImageLoader(Activity activity) {
         this.context = activity;
-
-
-        fileCache = new FileCache(activity);
-
+        fileCache = new FileCache(activity.getApplicationContext());
         // Creates a thread pool that reuses a fixed number of 
         // threads operating off a shared unbounded queue.
         executorService = Executors.newFixedThreadPool(5);

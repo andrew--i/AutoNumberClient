@@ -1,6 +1,5 @@
 package ai.autonumber.cache;
 
-import android.app.Activity;
 import android.content.Context;
 
 import java.io.File;
@@ -10,10 +9,9 @@ import ai.autonumber.R;
 public class FileCache {
     private File cacheDir;
 
-    public FileCache(Activity activity) {
+    public FileCache(Context context) {
 
         //Find the dir at SDCARD to save cached images
-        Context context = activity.getApplicationContext();
         if (android.os.Environment.getExternalStorageState().equals(
                 android.os.Environment.MEDIA_MOUNTED)) {
             //if SDCARD is mounted (SDCARD is present on device and mounted)
@@ -46,5 +44,4 @@ public class FileCache {
         for (File f : files)
             f.delete();
     }
-
 }
