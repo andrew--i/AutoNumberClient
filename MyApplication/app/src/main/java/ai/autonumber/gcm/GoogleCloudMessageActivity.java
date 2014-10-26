@@ -214,8 +214,7 @@ public abstract class GoogleCloudMessageActivity extends Activity {
 
             String message = intent.getStringExtra(GcmIntentService.CHAT_MESSAGE_TOKEN);
             if (message != null) {
-                ChatMessage chatMessage = ChatMessage.fromJson(message);
-                handleChatMessage(chatMessage);
+                handleChatMessageId(message);
             }
 
             String newCarMessage = intent.getStringExtra(GcmIntentService.NEW_CAR_MESSAGE_TOKEN);
@@ -258,7 +257,7 @@ public abstract class GoogleCloudMessageActivity extends Activity {
 
     protected abstract void handleNewCarMessage(CarMessage carMessage);
 
-    protected abstract void handleChatMessage(ChatMessage chatMessage);
+    protected abstract void handleChatMessageId(String messageId);
 
     protected abstract void handleChangeCurrentUser();
 

@@ -66,7 +66,7 @@ public class GcmIntentService extends IntentService {
 
             Object chatMessageObject = extras.get(CHAT_MESSAGE_TOKEN);
             if (chatMessageObject != null)
-                activitiIntent.putExtra(CHAT_MESSAGE_TOKEN, new String(Base64.decode(chatMessageObject.toString(), Base64.DEFAULT)));
+                activitiIntent.putExtra(CHAT_MESSAGE_TOKEN, chatMessageObject.toString());
             Object searchCarObject = extras.get(NEW_CAR_MESSAGE_TOKEN);
             if (searchCarObject != null)
                 activitiIntent.putExtra(NEW_CAR_MESSAGE_TOKEN, searchCarObject.toString());

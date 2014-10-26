@@ -22,14 +22,12 @@ import ai.autonumber.util.ImageLoader;
  * Created by Andrew on 19.10.2014.
  */
 public class LazyPhotoLoadAdapter extends BaseAdapter {
-    private Activity activity;
     private List<Integer> photoIds = new ArrayList<Integer>();
     private static LayoutInflater inflater = null;
     private ImageLoader imageLoader;
 
 
     public LazyPhotoLoadAdapter(Activity activity) {
-        this.activity = activity;
         imageLoader = new ImageLoader(activity);
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }

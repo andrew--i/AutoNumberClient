@@ -84,8 +84,7 @@ public class ImageLoader {
 
         // pass PhotoToLoad object to PhotosLoader runnable class
         // and submit PhotosLoader runnable to executers to run runnable
-        // Submits a PhotosLoader runnable task for execution  
-
+        // Submits a PhotosLoader runnable task for execution 
         executorService.submit(new PhotosLoader(p), context);
     }
 

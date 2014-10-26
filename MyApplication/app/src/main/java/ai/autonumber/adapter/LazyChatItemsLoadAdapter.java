@@ -1,72 +1,81 @@
 package ai.autonumber.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import ai.autonumber.R;
+import ai.autonumber.cache.ChatMessagesCache;
 import ai.autonumber.model.ChatMessage;
 import ai.autonumber.model.User;
+import ai.autonumber.util.ChatMessageLoader;
 
 
-public class ChatItemsArrayAdapter extends ArrayAdapter<ChatMessage> {
+public class LazyChatItemsLoadAdapter extends BaseAdapter {
 
 
-    private List<ChatMessage> messages = new ArrayList<ChatMessage>();
+    private List<String> messagesIds = new ArrayList<String>();
+    private LayoutInflater rowInflater;
+    private ChatMessageLoader chatMessageLoader;
 
-    @Override
-    public void add(ChatMessage message) {
-        for (ChatMessage chatMessage : messages) {
-            if (message.getMessageId().equalsIgnoreCase(chatMessage.getMessageId()))
+    public void add(String messageId) {
+        for (String id : messagesIds) {
+            if (messageId.equalsIgnoreCase(id))
                 return;
         }
 
-        messages.add(message);
-        Collections.sort(messages, new Comparator<ChatMessage>() {
+        messagesIds.add(messageId);
+        Collections.sort(messagesIds, new Comparator<String>() {
             @Override
-            public int compare(ChatMessage m1, ChatMessage m2) {
-                BigInteger mi1 = m1.getMessageIdAsBitInt();
-                BigInteger mi2 = m2.getMessageIdAsBitInt();
-                return mi1.compareTo(mi2);
+            public int compare(String m1, String m2) {
+                Long ml1 = Long.parseLong(m1);
+                Long ml2 = Long.parseLong(m2);
+                return ml1.compareTo(ml2);
             }
         });
-        super.add(message);
+        notifyDataSetChanged();
     }
 
-    public ChatItemsArrayAdapter(Context context, int textViewResourceId) {
-        super(context, textViewResourceId);
+    public LazyChatItemsLoadAdapter(Context context, ChatMessagesCache chatMessagesCache) {
+        chatMessageLoader = new ChatMessageLoader(chatMessagesCache, this);
+        rowInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     public int getCount() {
-        return this.messages.size();
+        return this.messagesIds.size();
     }
 
-    public ChatMessage getItem(int index) {
-        return this.messages.get(index);
+    public String getItem(int index) {
+        return this.messagesIds.get(index);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
         if (row == null) {
-            LayoutInflater inflater = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            row = inflater.inflate(R.layout.chat_item, parent, false);
+            row = rowInflater.inflate(R.layout.chat_item, parent, false);
         }
+        chatMessageLoader.loadMessage(getItem(position), row);
+        return row;
+    }
 
-
-        ChatMessage message = getItem(position);
-
+    public void updateRow(View row, ChatMessage message) {
         TextView chatMessageView = (TextView) row.findViewById(R.id.chatMessage);
         chatMessageView.setText(message.getText());
         chatMessageView.setBackgroundResource(message.isLeft() ? R.drawable.bubble_yellow : R.drawable.bubble_green);
@@ -89,16 +98,10 @@ public class ChatItemsArrayAdapter extends ArrayAdapter<ChatMessage> {
 
         LinearLayout chatItemTop = (LinearLayout) row.findViewById(R.id.chatItemTop);
         chatItemTop.setGravity(!message.isLeft() ? Gravity.START : Gravity.END);
-
-
-        return row;
     }
 
     public void updateUserMessages(User user) {
-        for (ChatMessage message : messages) {
-            if (user.equals(message.getUser()))
-                message.setUser(user);
-        }
+        chatMessageLoader.updateMessages(user);
         notifyDataSetChanged();
     }
 }

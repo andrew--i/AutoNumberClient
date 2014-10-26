@@ -8,6 +8,7 @@ import java.util.List;
 
 import ai.autonumber.activiti.AutoNumberChatActivity;
 import ai.autonumber.R;
+import ai.autonumber.cache.ChatMessagesCache;
 import ai.autonumber.model.CarMessage;
 import ai.autonumber.model.ChatMessage;
 import ai.autonumber.model.User;
@@ -20,11 +21,13 @@ public class ControllerManager {
     private final ChatController chatController;
     private final List<Controller> controllers;
     private Controller activeController = null;
+    private ChatMessagesCache chatMessagesCache;
 
 
     public ControllerManager(AutoNumberChatActivity activity) {
         this.activity = activity;
-        chatController = new ChatController(activity, this);
+        chatMessagesCache = new ChatMessagesCache(activity.getApplicationContext());
+        chatController = new ChatController(activity, this, chatMessagesCache);
         mainController = new MainController(activity, this);
         controllers = Arrays.asList(mainController, chatController);
     }
@@ -64,17 +67,19 @@ public class ControllerManager {
 
     }
 
-    public void handleChatMessage(ChatMessage message) {
-        chatController.handleChatMessage(message);
+    public void handleChatMessageId(String messageId) {
+        chatController.handleChatMessage(messageId);
     }
 
     public void resumeControllers() {
+        chatMessagesCache.open();
         for (Controller controller : controllers) {
             controller.resumeController();
         }
     }
 
     public void pauseControllers() {
+        chatMessagesCache.close();
         for (Controller controller : controllers) {
             controller.pauseController();
         }

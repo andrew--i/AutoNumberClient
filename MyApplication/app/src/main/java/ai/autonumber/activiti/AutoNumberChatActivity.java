@@ -13,7 +13,6 @@ import ai.autonumber.controller.ControllerManager;
 import ai.autonumber.controller.MainController;
 import ai.autonumber.gcm.GoogleCloudMessageActivity;
 import ai.autonumber.model.CarMessage;
-import ai.autonumber.model.ChatMessage;
 import ai.autonumber.model.User;
 import ai.autonumber.state.AppStateHolder;
 
@@ -38,8 +37,8 @@ public class AutoNumberChatActivity extends GoogleCloudMessageActivity {
 
 
     @Override
-    protected void handleChatMessage(ChatMessage message) {
-        controllerManager.handleChatMessage(message);
+    protected void handleChatMessageId(String messageId) {
+        controllerManager.handleChatMessageId(messageId);
     }
 
     @Override

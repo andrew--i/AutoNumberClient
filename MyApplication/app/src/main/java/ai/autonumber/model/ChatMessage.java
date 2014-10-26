@@ -15,7 +15,6 @@ public class ChatMessage implements Serializable {
     private String text;
     private String messageId;
     private String time;
-    private BigInteger messageIdAsBitInt;
     private User user;
 
     public User getUser() {
@@ -35,7 +34,7 @@ public class ChatMessage implements Serializable {
     }
 
     public boolean isLeft() {
-        return  user != null && user.equals(AppStateHolder.currentUser);
+        return user != null && user.equals(AppStateHolder.currentUser);
     }
 
     public static ChatMessage fromJson(String text) {
@@ -43,7 +42,6 @@ public class ChatMessage implements Serializable {
             JSONObject jsonObject = new JSONObject(text);
             ChatMessage chatMessage = new ChatMessage();
             chatMessage.messageId = jsonObject.getString("messageId");
-            chatMessage.messageIdAsBitInt = new BigInteger(chatMessage.messageId);
             chatMessage.user = User.fromJson(jsonObject.getString("user"));
             try {
                 byte[] decode = Base64.decode(jsonObject.getString("text").getBytes(), Base64.DEFAULT);
@@ -59,8 +57,20 @@ public class ChatMessage implements Serializable {
         }
     }
 
-    public BigInteger getMessageIdAsBitInt() {
-        return messageIdAsBitInt;
+    public String toJson() {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("messageId", messageId);
+            jsonObject.put("user", user.toJson());
+            byte[] bytes = text.getBytes();
+            byte[] encode = Base64.encode(bytes, Base64.DEFAULT);
+            jsonObject.put("text", new String(encode));
+            jsonObject.put("time", time);
+            return jsonObject.toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void setUser(User user) {

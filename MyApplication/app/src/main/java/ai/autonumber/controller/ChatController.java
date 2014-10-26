@@ -15,18 +15,20 @@ import java.util.List;
 
 import ai.autonumber.activiti.AutoNumberChatActivity;
 import ai.autonumber.R;
-import ai.autonumber.adapter.ChatItemsArrayAdapter;
+import ai.autonumber.adapter.LazyChatItemsLoadAdapter;
+import ai.autonumber.cache.ChatMessagesCache;
 import ai.autonumber.gcm.ServerUtilities;
 import ai.autonumber.model.ChatMessage;
 import ai.autonumber.model.User;
 
 public class ChatController extends Controller {
-    public ChatController(AutoNumberChatActivity activity, final ControllerManager controllerManager) {
-        super(activity, controllerManager);
 
+
+    public ChatController(AutoNumberChatActivity activity, final ControllerManager controllerManager, ChatMessagesCache chatMessagesCache) {
+        super(activity, controllerManager);
         //init chat view
         ListView chatView = (ListView) findViewById(R.id.chatView);
-        ChatItemsArrayAdapter adapter = new ChatItemsArrayAdapter(activity.getApplicationContext(), R.layout.chat_item);
+        LazyChatItemsLoadAdapter adapter = new LazyChatItemsLoadAdapter(activity.getApplicationContext(), chatMessagesCache);
         chatView.setAdapter(adapter);
     }
 
@@ -37,7 +39,6 @@ public class ChatController extends Controller {
 
     @Override
     protected void onHandleStartActive() {
-
         final Button camButton = (Button) findViewById(R.id.camButton);
         final Button chatButton = (Button) findViewById(R.id.chatButton);
         final EditText chatInput = (EditText) findViewById(R.id.chatInput);
@@ -79,9 +80,9 @@ public class ChatController extends Controller {
     }
 
 
-    public void handleChatMessage(ChatMessage message) {
+    public void handleChatMessage(String messageId) {
         final ListView chatView = (ListView) findViewById(R.id.chatView);
-        ((ChatItemsArrayAdapter) chatView.getAdapter()).add(message);
+        ((LazyChatItemsLoadAdapter) chatView.getAdapter()).add(messageId);
         chatView.post(new Runnable() {
             @Override
             public void run() {
@@ -126,7 +127,7 @@ public class ChatController extends Controller {
         chatView.post(new Runnable() {
             @Override
             public void run() {
-                ((ChatItemsArrayAdapter) chatView.getAdapter()).updateUserMessages(user);
+                ((LazyChatItemsLoadAdapter) chatView.getAdapter()).updateUserMessages(user);
             }
         });
     }

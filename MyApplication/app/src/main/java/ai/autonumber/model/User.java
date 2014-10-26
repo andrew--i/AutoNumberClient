@@ -9,27 +9,27 @@ import java.io.Serializable;
 
 
 public class User implements Serializable {
-  private String id;
-  private String regId;
-  private String deviceName;
-  private String humanName;
+    private String id;
+    private String regId;
+    private String deviceName;
+    private String humanName;
 
 
-  public String getId() {
-    return id;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public void setId(String id) {
-    this.id = id;
-  }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public String getRegId() {
-    return regId;
-  }
+    public String getRegId() {
+        return regId;
+    }
 
-  public void setRegId(String regId) {
-    this.regId = regId;
-  }
+    public void setRegId(String regId) {
+        this.regId = regId;
+    }
 
     public String getDeviceName() {
         return deviceName;
@@ -69,5 +69,20 @@ public class User implements Serializable {
     @Override
     public boolean equals(Object o) {
         return o instanceof User ? ((User) o).getId().equals(getId()) : super.equals(o);
+    }
+
+    public String toJson() {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("id", id);
+            jsonObject.put("name", deviceName);
+            byte[] encode = Base64.encode(humanName.getBytes(), Base64.DEFAULT);
+            jsonObject.put("readableName", new String(encode));
+            jsonObject.put("regId", regId);
+            return new String(Base64.encode(jsonObject.toString().getBytes(), Base64.DEFAULT));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
